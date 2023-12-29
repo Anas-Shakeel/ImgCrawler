@@ -9,7 +9,7 @@ from backend import ImgPile
 class App(tk.Tk):
     # program name
     PROGRAM_NAME = "ImgCrawler"
-    
+
     def __init__(self):
         super().__init__()
 
@@ -19,3 +19,8 @@ class App(tk.Tk):
         self.minsize(520, 380)
         self.state("zoomed")
         self.option_add("*tearOff", tk.FALSE)
+        self.protocol("WM_DELETE_WINDOW", self.exit_app)
+
+    def exit_app(self):
+        """ Method for exiting the application the right way """
+        self.destroy()
