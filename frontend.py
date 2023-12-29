@@ -10,5 +10,5 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        # Gui INIT
+        # code for the frontend (gui)
         ...
