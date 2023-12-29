@@ -62,7 +62,7 @@ class ImgPile:
 
             # extract next_page_link
             # if link found, store and call next iteration
-            next_page=""
+            next_page = ""
             try:
                 next_page = soup.select_one("li.pagination-next a").get("href")
             except AttributeError:
@@ -116,10 +116,9 @@ class ImgPile:
         else:
             os.mkdir(self.title)
             print(f"Created Folder: {self.title}")
-        
-        
+
         print(f"*** {len(self.all_images)} images will be download ***")
-            
+
         # downloading images one by one
         for link in tqdm(self.all_images, desc="Downloading images", colour="green", leave=False):
             try:
@@ -131,14 +130,18 @@ class ImgPile:
 
                 # if file exists, skip
                 if os.path.exists(directory):
-                    # print("File Already Exists!")
                     continue
                 else:
                     # download the image, otherwise
-                    # print(f"Downloading {name}")
                     response = requests.get(link, headers=self.headers)
                     # saving image
                     with open(directory, 'wb') as img:
                         img.write(response.content)
             except:
                 continue
+
+    def execute(self):
+        """ Executes the whole Scrap """
+        self.extract_pages()
+        self.extract_images()
+        self.download_images()
