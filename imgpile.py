@@ -14,35 +14,22 @@ class ImgPile:
     def __init__(self) -> None:
         self.headers = {'User-Agent': 'Mozilla/5.0'}
 
+        # Stores all pages & images
+        self.all_images = []
+
     def get(self, url: str):
         """ 
         ### Get
         This method will get the data you need regarding given `url`.
         """
-        # Stores all pages after calling 'extract_pages()' method
-        self.all_pages = [url]
+        pages = self.extract_pages(url)
+        images = []
+        
 
-        # stores all images after calling 'extract_images()' method
-        self.all_images = []
-
-        return url
-        ...
-
-    def get_title(self):
-        """extract Title from Webpage"""
-        # access main url
-        r = requests.get(self.url, headers=self.headers)
-
-        # extract title
-        head_title = SoupStrainer("title")
-        soup = BeautifulSoup(r.text, 'html.parser', parse_only=head_title)
-
-        # return title
-        return soup.text
-
-    def extract_pages(self):
+    def extract_pages(self, start_page):
         """Extracts all page links"""
-        print("Extracting pages...")
+        # will hold page links
+        temp_pages = [start_page]
 
         def recurse(page):
             # accessing page
@@ -64,14 +51,15 @@ class ImgPile:
                 next_page = soup.select_one("li.pagination-next a").get("href")
             except AttributeError:
                 pass
-            if next_page is not None:
-                self.all_pages.append(next_page)
+            if next_page:
+                temp_pages.append(next_page)
                 recurse(next_page)
             else:
                 return
 
         # calling a recursive function to extract all pages
-        recurse(self.url)
+        recurse(start_page)
+        return temp_pages
 
     def extract_images(self):
         """Extract all image links from current page"""
@@ -105,6 +93,27 @@ class ImgPile:
                 # extracting download link and storing in 'all_images' list
                 self.all_images.append(soup.a['href'])
 
+    def extract_data(self, url):
+        """ 
+        ### Extract Data
+        extracts all the data of an image and returns a dictionary
+        """
+        # dict data storage
+        data = {
+            "image_url": "",
+            "thumb_url": "",
+            "lq_url": "",
+            "name": "",
+            "size": "",
+            "resolution": "",
+            "views": "",
+            "likes": "",
+            "uploader": "",
+            "uploaded": ""
+        }
+
+        ...
+
     def download_images(self):
         """Downloads all extracted images"""
         # create folder
@@ -136,6 +145,18 @@ class ImgPile:
                         img.write(response.content)
             except:
                 continue
+
+    def get_title(self):
+        """extract Title from Webpage"""
+        # access main url
+        r = requests.get(self.url, headers=self.headers)
+
+        # extract title
+        head_title = SoupStrainer("title")
+        soup = BeautifulSoup(r.text, 'html.parser', parse_only=head_title)
+
+        # return title
+        return soup.text
 
     def execute(self):
         """ Executes the whole Scrap """
