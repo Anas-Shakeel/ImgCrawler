@@ -8,31 +8,29 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from bs4 import SoupStrainer
+from time import sleep
 
 
 class ImgPile:
     def __init__(self) -> None:
         self.headers = {'User-Agent': 'Mozilla/5.0'}
 
-        # Stores all pages & images
-        self.all_images = []
-
     def get(self, url: str):
         """ 
         ### Get
         This method will get the data you need regarding given `url`.
         """
-        # pages = self.extract_pages(url)
-        # master_data = [self.extract_data(page) for page in pages]
-        # for page in pages:
-            # self.extract_data(page)
-        
-        self.extract_image_data(url)
-        
-        # print(self.all_images)
-        
-        # return master_data
-        
+        # Extract all pages
+        pages = self.extract_pages(url)
+
+        # Stores all pages & images
+        master_data = []
+        # Iterate through every page and extract image links
+        for page in pages:
+            for link in self.extract_image_links(page):
+                master_data.append(self.extract_image_data(link))
+                
+        return master_data
 
     def extract_pages(self, start_page):
         """Extracts all page links"""
@@ -69,61 +67,11 @@ class ImgPile:
         recurse(start_page)
         return temp_pages
 
-    def extract_images(self):
-        """Extract all image links from current page"""
-        # from each page, extract images
-        for page in self.all_pages:
-            if page == "":
-                break
-            # accessing current page
-            r = requests.get(page, headers=self.headers)
-
-            # Extracting its HTML
-            content_div = SoupStrainer(
-                "div", attrs={"id": "content-listing-tabs"})
-            soup = BeautifulSoup(r.text, "html.parser", parse_only=content_div)
-
-            # iterating through each image and extracting its image's page links
-            for tag in soup.select("a.image-container"):
-                # printing image links
-                print("Extracting: ", tag['href'])
-
-                # accessing image's page
-                r = requests.get(tag['href'], headers=self.headers)
-
-                # extracting its HTML
-                # link_div = SoupStrainer("div", {"class":"header-content-right"})
-                link_div = SoupStrainer(
-                    "a", {"class": "btn btn-download default"})
-                soup = BeautifulSoup(
-                    r.text, "html.parser", parse_only=link_div)
-
-                # extracting download link and storing in 'all_images' list
-                self.all_images.append(soup.a['href'])
-
-    def extract_data(self, page):
+    def extract_image_links(self, page):
         """ 
-        ### Extract Data
-        extracts all the data of an image and returns a dictionary
+        ### Extract Image Links
+        extracts all image links and yields the url
         """
-        # dict data storage
-        data = {
-            "image_url": "",
-            "thumb_url": "",
-            "lq_url": "",
-            "name": "",
-            "size": "",
-            "resolution": "",
-            "views": "",
-            "likes": "",
-            "uploader": "",
-            "uploaded": ""
-        }
-
-        # from each page, extract images
-        # if page == "":
-        #     break
-        
         # accessing current page
         r = requests.get(page, headers=self.headers)
 
@@ -134,23 +82,8 @@ class ImgPile:
 
         # iterating through each image and extracting its image's page links
         for tag in soup.select("a.image-container"):
-            # printing image links
-            # print("Extracting: ", tag['href'])
-            print(self.extract_image_data(tag['href']))
-            """
-            # accessing image's page
-            r = requests.get(tag['href'], headers=self.headers)
-
-            # extracting its HTML
-            # link_div = SoupStrainer("div", {"class":"header-content-right"})
-            link_div = SoupStrainer(
-                "a", {"class": "btn btn-download default"})
-            soup = BeautifulSoup(
-                r.text, "html.parser", parse_only=link_div)
-
-            # extracting download link and storing in 'all_images' list
-            self.all_images.append(soup.a['href'])
-            """
+            # Extracting image link
+            yield tag['href']
 
     def extract_image_data(self, image_url):
         """ 
@@ -159,40 +92,54 @@ class ImgPile:
         """
         # accessing image's page
         r = requests.get(image_url, headers=self.headers)
-
-        # extracting its HTML
-        # link_div = SoupStrainer("div", {"class":"header-content-right"})
+        
+        # Extracting HTML
         link_div = SoupStrainer(
             "div", {"class": "content-width"})
         soup = BeautifulSoup(
             r.text, "html.parser", parse_only=link_div)
 
-        # title = soup.find("h1", class_="viewer-title").text
+        # * EXTRACTING BEGINS
+        title = soup.find("h1", class_="viewer-title").text
         # uploader = soup.find("span", class_="user-link").text
-        
+
         # Image metadata
-        image_metadata = soup.find("a", class_="btn btn-download default")['title'].split("-")
+        image_metadata = soup.find(
+            "a", class_="btn btn-download default")['title'].split("-")
         temp = image_metadata[1].strip().split()
         image_type = temp[0]
         image_size = f"{temp[1]} {temp[2]}"
         image_res = image_metadata[0].strip()
-        
-        
+
         # Views and likes
-        views_likes_meta = soup.select("div.header div.header-content-right")[-1].text.strip().split("\n")
+        views_likes_meta = soup.select(
+            "div.header div.header-content-right")[-1].text.strip().split("\n")
         views = views_likes_meta[0]
         likes = views_likes_meta[1].strip()
-        
-        # Images links
-        # links = soup.find("div", "panel-share c16 phablet-c1 grid-columns margin-right-10")
-        links = soup.select("div.panel-share div.panel-share-item")[0]
-        for code in links.find_all("div", class_="panel-share-input-label copy-hover-display"):
-            print(code.input['value'])
-        
 
-        ...
-        # extracting download link and storing in 'all_images' list
-        # return soup.a['href']
+        # Image links storage
+        urls = [''] * 4
+        embed_codes = soup.select("div.panel-share div.panel-share-item")[0]
+        for index, code in enumerate(embed_codes.find_all("div", class_="panel-share-input-label copy-hover-display")):
+            urls[index] = code.input['value']
+
+        uploaded = soup.find(
+            "p", class_="description-meta margin-bottom-5").span.text
+
+        # ? Creating data dictionary & returning
+        return {
+            "image_url": urls[0],
+            "image_link": urls[1],
+            "thumb_url": urls[2],
+            "lq_url": urls[3],
+            "title": title,
+            "size": image_size,
+            "resolution": image_res,
+            "image_type": image_type,
+            "views": views,
+            "likes": likes,
+            "uploaded": uploaded
+        }
 
     def download_images(self):
         """Downloads all extracted images"""
@@ -225,43 +172,3 @@ class ImgPile:
                         img.write(response.content)
             except:
                 continue
-
-    def get_title(self):
-        """extract Title from Webpage"""
-        # access main url
-        r = requests.get(self.url, headers=self.headers)
-
-        # extract title
-        head_title = SoupStrainer("title")
-        soup = BeautifulSoup(r.text, 'html.parser', parse_only=head_title)
-
-        # return title
-        return soup.text
-
-    def execute(self):
-        """ Executes the whole Scrap """
-        self.extract_pages()
-        self.extract_images()
-        self.download_images()
-
-
-# ! What This API Sould Have?
-""" 
-Must have a function that takes a url repeatedly!
-Give back the result.
-"""
-
-# ! What This API Sould Do?
-"""
-take a url as input
-extract the data required!
-return the data back as a list of dicts of data
-"""
-
-# ! What This API Shouldn't Do?
-"""
-Downloading
-printing anything to the console
-getting the title
-
-"""
