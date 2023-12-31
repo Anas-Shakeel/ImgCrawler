@@ -24,6 +24,13 @@ class ImgPile:
         # stores all images after calling 'extract_images()' method
         self.all_images = []
 
+    def get(self, url: str):
+        """ 
+        ### Get
+        This method will get the data you need regarding given `url`.
+        """
+        ...
+
     def get_title(self):
         """extract Title from Webpage"""
         # access main url
@@ -140,13 +147,23 @@ class ImgPile:
         self.download_images()
 
 
-# ! What Will This API Do?
+# ! What This API Sould Have?
+""" 
+Must have a function that takes a url repeatedly!
+Give back the result.
+"""
+
+# ! What This API Sould Do?
 """
 take a url as input
 extract the data required!
 return the data back as a list of dicts of data
+"""
 
-
-DOWNLOADING must be handled by the users of this api themselves
+# ! What This API Shouldn't Do?
+"""
+Downloading
+printing anything to the console
+getting the title
 
 """
