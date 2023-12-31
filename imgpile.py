@@ -22,8 +22,16 @@ class ImgPile:
         ### Get
         This method will get the data you need regarding given `url`.
         """
-        pages = self.extract_pages(url)
-        images = []
+        # pages = self.extract_pages(url)
+        # master_data = [self.extract_data(page) for page in pages]
+        # for page in pages:
+            # self.extract_data(page)
+        
+        self.extract_image_data(url)
+        
+        # print(self.all_images)
+        
+        # return master_data
         
 
     def extract_pages(self, start_page):
@@ -93,7 +101,7 @@ class ImgPile:
                 # extracting download link and storing in 'all_images' list
                 self.all_images.append(soup.a['href'])
 
-    def extract_data(self, url):
+    def extract_data(self, page):
         """ 
         ### Extract Data
         extracts all the data of an image and returns a dictionary
@@ -112,7 +120,76 @@ class ImgPile:
             "uploaded": ""
         }
 
+        # from each page, extract images
+        # if page == "":
+        #     break
+        
+        # accessing current page
+        r = requests.get(page, headers=self.headers)
+
+        # Extracting its HTML
+        content_div = SoupStrainer(
+            "div", attrs={"id": "content-listing-tabs"})
+        soup = BeautifulSoup(r.text, "html.parser", parse_only=content_div)
+
+        # iterating through each image and extracting its image's page links
+        for tag in soup.select("a.image-container"):
+            # printing image links
+            # print("Extracting: ", tag['href'])
+            print(self.extract_image_data(tag['href']))
+            """
+            # accessing image's page
+            r = requests.get(tag['href'], headers=self.headers)
+
+            # extracting its HTML
+            # link_div = SoupStrainer("div", {"class":"header-content-right"})
+            link_div = SoupStrainer(
+                "a", {"class": "btn btn-download default"})
+            soup = BeautifulSoup(
+                r.text, "html.parser", parse_only=link_div)
+
+            # extracting download link and storing in 'all_images' list
+            self.all_images.append(soup.a['href'])
+            """
+
+    def extract_image_data(self, image_url):
+        """ 
+        ### Extract Image Data
+        extracts all the image data and returns it as a dictionary
+        """
+        # accessing image's page
+        r = requests.get(image_url, headers=self.headers)
+
+        # extracting its HTML
+        # link_div = SoupStrainer("div", {"class":"header-content-right"})
+        link_div = SoupStrainer(
+            "div", {"class": "content-width"})
+        soup = BeautifulSoup(
+            r.text, "html.parser", parse_only=link_div)
+
+        # title = soup.find("h1", class_="viewer-title").text
+        # uploader = soup.find("span", class_="user-link").text
+        
+        # Image metadata
+        image_metadata = soup.find("a", class_="btn btn-download default")['title'].split("-")
+        temp = image_metadata[1].strip().split()
+        image_type = temp[0]
+        image_size = f"{temp[1]} {temp[2]}"
+        image_res = image_metadata[0].strip()
+        
+        
+        # Views and likes
+        views_likes_meta = soup.select("div.header div.header-content-right")[-1].text.strip().split("\n")
+        views = views_likes_meta[0]
+        likes = views_likes_meta[1].strip()
+        
+        # Images links
+        links = soup.find("div", "panel-share c16 phablet-c1 grid-columns margin-right-10")
+        print(links)
+
         ...
+        # extracting download link and storing in 'all_images' list
+        # return soup.a['href']
 
     def download_images(self):
         """Downloads all extracted images"""
