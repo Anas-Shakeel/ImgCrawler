@@ -8,7 +8,6 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from bs4 import SoupStrainer
-from time import sleep
 
 
 class ImgPile:
@@ -29,7 +28,7 @@ class ImgPile:
         for page in pages:
             for link in self.extract_image_links(page):
                 master_data.append(self.extract_image_data(link))
-                
+
         return master_data
 
     def extract_pages(self, start_page):
@@ -50,8 +49,7 @@ class ImgPile:
             soup = BeautifulSoup(response.text, 'html.parser',
                                  parse_only=pagination)
 
-            # extract next_page_link
-            # if link found, store and call next iteration
+            # Extract next_page_link
             next_page = ""
             try:
                 next_page = soup.select_one("li.pagination-next a").get("href")
@@ -92,7 +90,7 @@ class ImgPile:
         """
         # accessing image's page
         r = requests.get(image_url, headers=self.headers)
-        
+
         # Extracting HTML
         link_div = SoupStrainer(
             "div", {"class": "content-width"})
@@ -101,7 +99,7 @@ class ImgPile:
 
         # * EXTRACTING BEGINS
         title = soup.find("h1", class_="viewer-title").text
-        # uploader = soup.find("span", class_="user-link").text
+        uploader = soup.find("span", class_="breadcrum-text float-left").text.strip()
 
         # Image metadata
         image_metadata = soup.find(
@@ -138,37 +136,6 @@ class ImgPile:
             "image_type": image_type,
             "views": views,
             "likes": likes,
+            "uploader": uploader,
             "uploaded": uploaded
         }
-
-    def download_images(self):
-        """Downloads all extracted images"""
-        # create folder
-        if os.path.exists(self.title):
-            print("Path Already Exists!")
-        else:
-            os.mkdir(self.title)
-            print(f"Created Folder: {self.title}")
-
-        print(f"*** {len(self.all_images)} images will be download ***")
-
-        # downloading images one by one
-        for link in self.all_images:
-            try:
-                # get file name
-                name = os.path.basename(link)
-
-                # directory
-                directory = os.path.join(self.title, name)
-
-                # if file exists, skip
-                if os.path.exists(directory):
-                    continue
-                else:
-                    # download the image, otherwise
-                    response = requests.get(link, headers=self.headers)
-                    # saving image
-                    with open(directory, 'wb') as img:
-                        img.write(response.content)
-            except:
-                continue
