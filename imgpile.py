@@ -11,24 +11,21 @@ from bs4 import SoupStrainer
 
 
 class ImgPile:
-    def __init__(self, url: str) -> None:
-        self.url = url
+    def __init__(self) -> None:
         self.headers = {'User-Agent': 'Mozilla/5.0'}
-
-        # folder title
-        self.title = self.get_title()
-
-        # Stores all pages after calling 'extract_pages()' method
-        self.all_pages = [self.url]
-
-        # stores all images after calling 'extract_images()' method
-        self.all_images = []
 
     def get(self, url: str):
         """ 
         ### Get
         This method will get the data you need regarding given `url`.
         """
+        # Stores all pages after calling 'extract_pages()' method
+        self.all_pages = [url]
+
+        # stores all images after calling 'extract_images()' method
+        self.all_images = []
+
+        return url
         ...
 
     def get_title(self):
