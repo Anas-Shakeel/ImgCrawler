@@ -4,7 +4,6 @@ This api scraps the imgpile.com website and sends back a list of
 dictionaries of images and their data.
 """
 
-import os
 import requests
 from bs4 import BeautifulSoup
 from bs4 import SoupStrainer
