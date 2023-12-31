@@ -184,8 +184,11 @@ class ImgPile:
         likes = views_likes_meta[1].strip()
         
         # Images links
-        links = soup.find("div", "panel-share c16 phablet-c1 grid-columns margin-right-10")
-        print(links)
+        # links = soup.find("div", "panel-share c16 phablet-c1 grid-columns margin-right-10")
+        links = soup.select("div.panel-share div.panel-share-item")[0]
+        for code in links.find_all("div", class_="panel-share-input-label copy-hover-display"):
+            print(code.input['value'])
+        
 
         ...
         # extracting download link and storing in 'all_images' list
