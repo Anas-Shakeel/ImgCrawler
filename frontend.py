@@ -39,11 +39,12 @@ class App(ctk.CTk):
         self.fields_frame.grid(row=0, column=0, sticky="we")
         self.mainframe.columnconfigure((0,), weight=1)
 
-        ctk.CTkLabel(self.fields_frame, font=("", 17), text="Target URL").grid(
+        ctk.CTkLabel(self.fields_frame, font=("", 18), text="Target URL").grid(
             row=0, column=0)
 
         self.entry_url = ctk.CTkEntry(self.fields_frame,
-                                      height=35,
+                                      height=35, font=("", 18),
+                                      text_color=("green", "#A6A6A6"),
                                       placeholder_text="Enter URL Here...")
         self.entry_url.grid(row=0, column=1, sticky="we")
         self.fields_frame.columnconfigure(1, weight=1)
@@ -108,12 +109,22 @@ class App(ctk.CTk):
         self.scrape_button.pack()
         """
 
+    def validate_url(self, url: str):
+        """ Validate URL """
+        ...
+
     def start_scraping(self, event=None):
         """
         ### Start Scraping
         Get the inputs and execute scraping
         """
-        url = self.url_var.get()
+        url = self.entry_url.get()
+        if not url and not self.validate_url(url):
+            # probably show an error dialog
+            # focus on the entry
+            return
+        print("DATA Scraped")
+        return
 
         # Disable button
         self.scrape_button.config(text="Please wait...", state=tk.DISABLED)
