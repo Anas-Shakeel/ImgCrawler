@@ -8,7 +8,7 @@ from tkinter import messagebox
 from backend import Backend
 import json
 from threading import Thread
-
+import threading
 
 class App(ctk.CTk):
     # program name
@@ -33,11 +33,39 @@ class App(ctk.CTk):
         self.columnconfigure((0,), weight=1)
         self.rowconfigure((0,), weight=1)
 
-        # * Widgets for mainframe
-        self.var_url = ctk.StringVar()
-        self.entry_url = ctk.CTkEntry(
-            self.mainframe, placeholder_text="Enter URL Here...", textvariable=self.var_url)
-        self.entry_url.grid(row=0, column=0, sticky="w")
+        # * Fields Frame [will hold input fields]
+        self.fields_frame = ctk.CTkFrame(self.mainframe)
+        self.fields_frame.grid(row=0, column=0, sticky="we")
+        self.mainframe.columnconfigure((0,), weight=1)
+
+        ctk.CTkLabel(self.fields_frame, text="Target URL").grid(
+            row=0, column=0)
+
+        self.entry_url = ctk.CTkEntry(self.fields_frame,
+                                      width=200,
+                                      placeholder_text="Enter URL Here...")
+        self.entry_url.grid(row=0, column=1, sticky="w")
+        
+        self.button_scrape = ctk.CTkButton(self.fields_frame, text="Scrape", width=15, command=self.start_scraping)
+        self.button_scrape.grid(row=0, column=2)
+        
+        self.button_scrape = ctk.CTkButton(self.fields_frame, text="Cancel", width=15, command=self.cancel_scraping)
+        self.button_scrape.grid(row=0, column=3)
+        
+        # for child in self.fields_frame.winfo_children():
+            # child.configure(padding="10")
+        
+        # * Output Field
+        self.view_frame = ctk.CTkScrollableFrame(self.mainframe, label_text="Images")
+        self.view_frame.grid(row=1, column=0, pady=10, sticky="nsew")
+        self.mainframe.rowconfigure(1, weight=1)
+        
+        for i in range(10):
+            ctk.CTkCheckBox(self.view_frame, text=str(i)).grid(sticky="w", padx=5, pady=3)
+        
+        # * Other Field
+        self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
+        self.other_frame.grid(row=2, sticky="we")
 
         # * Status bar
         self.status_bar = ctk.CTkFrame(self, height=25)
@@ -100,6 +128,11 @@ class App(ctk.CTk):
         # Error info
         messagebox.showerror(
             "Error Occurred", f"An error occurred: {str(error)}")
+
+    def cancel_scraping(self):
+        """ Cancel/Terminate the scraping thread """
+        print(self.entry_url.get())
+
 
     def exit_app(self):
         """ Method for exiting the application the right way """
