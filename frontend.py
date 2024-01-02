@@ -12,15 +12,15 @@ import threading
 
 
 class App(ctk.CTk):
-    # program name
     PROGRAM_NAME = "ImgCrawler"
+    PROGRAM_VER = "1.0"
 
     def __init__(self):
         super().__init__()
         self.backend = Backend()
 
         # * Root Configuration
-        self.title(self.PROGRAM_NAME)
+        self.title(f"{self.PROGRAM_NAME} {self.PROGRAM_VER}")
         # self.geometry("1024x768+10+10")
         self.geometry("640x480+10+10")
         self.minsize(520, 380)
@@ -39,22 +39,24 @@ class App(ctk.CTk):
         self.fields_frame.grid(row=0, column=0, sticky="we")
         self.mainframe.columnconfigure((0,), weight=1)
 
-        ctk.CTkLabel(self.fields_frame, text="Target URL").grid(
+        ctk.CTkLabel(self.fields_frame, font=("", 17), text="Target URL").grid(
             row=0, column=0)
 
         self.entry_url = ctk.CTkEntry(self.fields_frame,
-                                      width=200,
+                                      height=35,
                                       placeholder_text="Enter URL Here...")
-        self.entry_url.grid(row=0, column=1, sticky="w")
+        self.entry_url.grid(row=0, column=1, sticky="we")
+        self.fields_frame.columnconfigure(1, weight=1)
 
         self.button_scrape = ctk.CTkButton(
-            self.fields_frame, text="Scrape", width=15, command=self.start_scraping)
+            self.fields_frame, text="Scrape", width=90, height=35, command=self.start_scraping)
         self.button_scrape.grid(row=0, column=2)
 
         self.button_scrape = ctk.CTkButton(
-            self.fields_frame, text="Cancel", width=15, command=self.cancel_scraping)
+            self.fields_frame, text="Cancel", width=90, height=35, command=self.cancel_scraping)
         self.button_scrape.grid(row=0, column=3)
 
+        # ? Padding childs
         for child in self.fields_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
 
@@ -77,11 +79,18 @@ class App(ctk.CTk):
                                                width=90, height=35)
         self.button_select_all.grid(row=0, column=0)
 
-        self.button_deselect_all = ctk.CTkButton(self.other_frame, 
+        self.button_deselect_all = ctk.CTkButton(self.other_frame,
                                                  text="Deselect All",
                                                  width=90, height=35)
         self.button_deselect_all.grid(row=0, column=1)
-        
+
+        self.button_download = ctk.CTkButton(self.other_frame,
+                                             text="Download",
+                                             width=90, height=35,)
+        self.button_download.grid(row=0, column=2, sticky="e")
+        self.other_frame.columnconfigure((2,), weight=1)
+
+        # ? Padding childs
         for child in self.other_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
 
@@ -101,8 +110,8 @@ class App(ctk.CTk):
 
     def start_scraping(self, event=None):
         """
-        ### Get Data
-        Get the image data from backend
+        ### Start Scraping
+        Get the inputs and execute scraping
         """
         url = self.url_var.get()
 
@@ -131,6 +140,9 @@ class App(ctk.CTk):
         # Enable scrape button
         self.scrape_button.config(text="Start Scraping", state=tk.NORMAL)
 
+        # * Change the title of view_frame
+        ...
+
         # Dump Json data
         with open("temp.json", "w") as tempfile:
             json.dump(result, tempfile, indent=4)
@@ -149,7 +161,7 @@ class App(ctk.CTk):
 
     def cancel_scraping(self):
         """ Cancel/Terminate the scraping thread """
-        print(self.entry_url.get())
+        ...
 
     def exit_app(self):
         """ Method for exiting the application the right way """
