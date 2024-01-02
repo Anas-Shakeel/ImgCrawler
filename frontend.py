@@ -2,6 +2,7 @@
 ### Frontend for ImgPile Scraper
 """
 import tkinter as tk
+import customtkinter as ctk
 from tkinter import ttk
 from tkinter import messagebox
 from backend import Backend
@@ -9,7 +10,7 @@ import json
 from threading import Thread
 
 
-class App(tk.Tk):
+class App(ctk.CTk):
     # program name
     PROGRAM_NAME = "ImgCrawler"
 
@@ -19,12 +20,30 @@ class App(tk.Tk):
 
         # * Root Configuration
         self.title(self.PROGRAM_NAME)
-        self.geometry("1280x720+0+10")
+        # self.geometry("1024x768+10+10")
+        self.geometry("640x480+10+10")
         self.minsize(520, 380)
-        self.state("zoomed")
+        # self.after(0, lambda: self.state("zoomed"))
         self.option_add("*tearOff", tk.FALSE)
         self.protocol("WM_DELETE_WINDOW", self.exit_app)
 
+        # * Mainframe [to hold everything]
+        self.mainframe = ctk.CTkFrame(self)
+        self.mainframe.grid(sticky="news", padx=10, pady=10)
+        self.columnconfigure((0,), weight=1)
+        self.rowconfigure((0,), weight=1)
+
+        # * Widgets for mainframe
+        self.var_url = ctk.StringVar()
+        self.entry_url = ctk.CTkEntry(
+            self.mainframe, placeholder_text="Enter URL Here...", textvariable=self.var_url)
+        self.entry_url.grid(row=0, column=0, sticky="w")
+
+        # * Status bar
+        self.status_bar = ctk.CTkFrame(self, height=25)
+        self.status_bar.grid(sticky="ew")
+
+        """
         # ! TEMPORARY Data Entry Stuff :: REMOVE Afterwards
         self.url_var = tk.StringVar()
         self.url_var.set("https://imgpile.com/search/images/?q=shelby+gt")
@@ -32,6 +51,7 @@ class App(tk.Tk):
         self.scrape_button = ttk.Button(
             self, text="Start Scraping", command=self.start_scraping)
         self.scrape_button.pack()
+        """
 
     def start_scraping(self, event=None):
         """
