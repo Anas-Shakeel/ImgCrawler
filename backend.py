@@ -48,7 +48,7 @@ class Backend:
         # Calculate and return bytes
         return round(factors[unit] * size, 3)
 
-    def to_human_readable_storage(self, bytes_size=1441075):
+    def to_human_readable_storage(self, bytes_size):
         """ 
         ### To Human Readable Storage
         Converts `bytes_size` to human readable format.
