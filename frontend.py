@@ -100,6 +100,7 @@ class App(ctk.CTk):
         self.status_bar.grid(sticky="ew")
 
         """
+        
         # ! TEMPORARY Data Entry Stuff :: REMOVE Afterwards
         self.url_var = tk.StringVar()
         self.url_var.set("https://imgpile.com/search/images/?q=shelby+gt")
@@ -111,7 +112,12 @@ class App(ctk.CTk):
 
     def validate_url(self, url: str):
         """ Validate URL """
-        ...
+        if url.startswith("http://imgpile.com/i/"):
+            return False
+        elif url.startswith("http://imgpile.com/"):
+            return True
+        else:
+            return False
 
     def start_scraping(self, event=None):
         """
