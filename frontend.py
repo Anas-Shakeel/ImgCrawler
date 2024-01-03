@@ -8,7 +8,6 @@ from tkinter import messagebox
 from backend import Backend
 import json
 from threading import Thread
-import threading
 
 
 class App(ctk.CTk):
@@ -18,6 +17,12 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.backend = Backend()
+
+        # * Will hold All scraped data
+        self.scraped_data = None
+        self.total_images = None
+        self.total_size = None
+        self.image_links = None
 
         # * Root Configuration
         self.title(f"{self.PROGRAM_NAME} {self.PROGRAM_VER}")
@@ -63,7 +68,7 @@ class App(ctk.CTk):
 
         # * Output Field
         self.view_frame = ctk.CTkScrollableFrame(
-            self.mainframe, label_text="247 Images were scraped!")
+            self.mainframe, label_text="Images")
         self.view_frame.grid(row=1, column=0, pady=10, sticky="nsew")
         self.mainframe.rowconfigure(1, weight=1)
 
@@ -77,7 +82,8 @@ class App(ctk.CTk):
 
         self.button_select_all = ctk.CTkButton(self.other_frame,
                                                text="Select All",
-                                               width=90, height=35)
+                                               width=90, height=35,
+                                               command=self.backend.to_bytes)
         self.button_select_all.grid(row=0, column=0)
 
         self.button_deselect_all = ctk.CTkButton(self.other_frame,
@@ -98,17 +104,6 @@ class App(ctk.CTk):
         # * Status bar
         self.status_bar = ctk.CTkFrame(self, height=25)
         self.status_bar.grid(sticky="ew")
-
-        """
-        
-        # ! TEMPORARY Data Entry Stuff :: REMOVE Afterwards
-        self.url_var = tk.StringVar()
-        self.url_var.set("https://imgpile.com/search/images/?q=shelby+gt")
-        ttk.Entry(self, textvariable=self.url_var).pack()
-        self.scrape_button = ttk.Button(
-            self, text="Start Scraping", command=self.start_scraping)
-        self.scrape_button.pack()
-        """
 
     def validate_url(self, url: str):
         """ Validate URL """
@@ -141,10 +136,10 @@ class App(ctk.CTk):
         # Disable button
         self.button_scrape.configure(text="Please wait...", state=tk.DISABLED)
 
-        return
+        # return
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
-            url,), name="Scraping - Python")
+            url,))
         scraping_thread.start()
 
     def scrape_in_background(self, url):
@@ -162,22 +157,48 @@ class App(ctk.CTk):
     def update_gui(self, result=None):
         """ Updates the GUI """
         # Enable scrape button
-        self.scrape_button.config(text="Start Scraping", state=tk.NORMAL)
+        self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
 
         # * Change the title of view_frame
         ...
 
+        # Save the response "class"ically :)
+        self.scraped_data = result
+        # Do some calculations regarding the data
+        self.update_properties()
+
+        """
         # Dump Json data
         with open("temp.json", "w") as tempfile:
             json.dump(result, tempfile, indent=4)
+        """
 
         # Success Info
         messagebox.showinfo("Success", "Data Extracted Successfully!")
 
+        # Update View_frame's title
+        self.view_frame.configure()
+
+    def update_properties(self):
+        """ 
+        ### Update Properties
+        updates or adds some properties regarding the scraped data such as
+        `len(total_images)`, `size(total_images)`, `links(all_images)` etc
+        """
+        self.total_images = len(self.scraped_data)
+
+        # * Calculate the size of total images
+        total_bytes = 0.0
+        for image in self.scraped_data:
+            size_unit = image['size'].split()
+            total_bytes += self.backend.to_bytes(float(size_unit[0]), size_unit[1])
+            
+        
+
     def handle_errors(self, error):
         """ Handles errors """
         # Enable scrape button
-        self.scrape_button.config(text="Start Scraping", state=tk.NORMAL)
+        self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
 
         # Error info
         messagebox.showerror(
