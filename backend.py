@@ -24,14 +24,6 @@ class Backend:
 
         ### Note
         It also selects sizes like "5.2 mb" etc
-
-        ```
-        >> fm._to_bytes(_size="5.0 kb")
-        5120
-
-        >> fm._to_bytes(_size="5.0 mb")
-        5242880
-        ```
         """
         # Extract values
         size = _size
@@ -52,9 +44,9 @@ class Backend:
             "MB": 1024 ** 2,
             "GB": 1024 ** 3,
         }
-
+        
         # Calculate and return bytes
-        return factors[unit] * size
+        return round(factors[unit] * size, 3)
 
     def to_human_readable_storage(self, bytes_size=1441075):
         """ 
