@@ -53,9 +53,9 @@ class App(ctk.CTk):
             self.fields_frame, text="Scrape", width=90, height=35, command=self.start_scraping)
         self.button_scrape.grid(row=0, column=2)
 
-        self.button_scrape = ctk.CTkButton(
+        self.button_scrape_cancel = ctk.CTkButton(
             self.fields_frame, text="Cancel", width=90, height=35, command=self.cancel_scraping)
-        self.button_scrape.grid(row=0, column=3)
+        self.button_scrape_cancel.grid(row=0, column=3)
 
         # ? Padding childs
         for child in self.fields_frame.winfo_children():
@@ -112,9 +112,10 @@ class App(ctk.CTk):
 
     def validate_url(self, url: str):
         """ Validate URL """
-        if url.startswith("http://imgpile.com/i/"):
+        if url.startswith("https://imgpile.com/i/"):
             return False
-        elif url.startswith("http://imgpile.com/"):
+
+        if url.startswith("https://imgpile.com/"):
             return True
         else:
             return False
@@ -125,16 +126,22 @@ class App(ctk.CTk):
         Get the inputs and execute scraping
         """
         url = self.entry_url.get()
-        if not url and not self.validate_url(url):
-            # probably show an error dialog
-            # focus on the entry
+
+        if not url:
+            messagebox.showerror("Invalid URL",
+                                 "Please enter a valid Album's URL from imgpile.com website.")
             return
-        print("DATA Scraped")
-        return
+
+        # URL Validation
+        if not self.validate_url(url):
+            messagebox.showerror("Invalid URL",
+                                 "Please enter a valid Album's URL from imgpile.com website.")
+            return
 
         # Disable button
-        self.scrape_button.config(text="Please wait...", state=tk.DISABLED)
+        self.button_scrape.configure(text="Please wait...", state=tk.DISABLED)
 
+        return
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
             url,), name="Scraping - Python")
