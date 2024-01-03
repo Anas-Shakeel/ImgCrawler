@@ -17,7 +17,7 @@ class Backend:
         """
         return self.img_api.get(url)
 
-    def to_bytes(self, _size: float, _unit: str):
+    def to_bytes(self, _size, _unit: str):
         """
         ### To Bytes
         Converts other Data Storage units to bytes
@@ -56,3 +56,24 @@ class Backend:
 
         # ? Calculate bytes
         return factors[unit] * size
+
+    def to_human_readable_storage(self, bytes_size=1441075):
+        """ 
+        ### To Human Readable Storage
+        Converts `bytes_size` to human readable format.
+        """
+
+        units = ['B', 'KB', 'MB', 'GB', 'TB']
+
+        size = bytes_size
+        unit_index = 0
+
+        while size >= 1024 and unit_index < len(units) - 1:
+            size /= 1024.0
+            unit_index += 1
+
+        # Adjust the format to avoid unnecessary decimal places for integers
+        formatted_size = "{:.2f}".format(size).rstrip('0').rstrip('.')
+        
+        return f"{formatted_size} {units[unit_index]}"
+    
