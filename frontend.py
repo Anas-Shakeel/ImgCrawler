@@ -186,7 +186,7 @@ class App(ctk.CTk):
         """
         # * Get the number of total images
         self.total_images = len(self.scraped_data)
-        
+
         # * Calculate the size of total images
         total_bytes = 0.0
         for image in self.scraped_data:
@@ -194,7 +194,6 @@ class App(ctk.CTk):
             total_bytes += self.backend.to_bytes(
                 float(size_unit[0]), size_unit[1])
         self.total_size = self.backend.to_human_readable_storage(total_bytes)
-        
 
     def handle_errors(self, error):
         """ Handles errors """
