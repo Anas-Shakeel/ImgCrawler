@@ -22,7 +22,6 @@ class App(ctk.CTk):
         self.scraped_data = None
         self.total_images = None
         self.total_size = None
-        self.image_links = None
 
         # * Root Configuration
         self.title(f"{self.PROGRAM_NAME} {self.PROGRAM_VER}")
@@ -83,7 +82,7 @@ class App(ctk.CTk):
         self.button_select_all = ctk.CTkButton(self.other_frame,
                                                text="Select All",
                                                width=90, height=35,
-                                               command=self.backend.to_bytes)
+                                               )
         self.button_select_all.grid(row=0, column=0)
 
         self.button_deselect_all = ctk.CTkButton(self.other_frame,
@@ -167,11 +166,11 @@ class App(ctk.CTk):
         # Do some calculations regarding the data
         self.update_properties()
 
-        """
+        # """
         # Dump Json data
         with open("temp.json", "w") as tempfile:
             json.dump(result, tempfile, indent=4)
-        """
+        # """
 
         # Success Info
         messagebox.showinfo("Success", "Data Extracted Successfully!")
@@ -185,14 +184,16 @@ class App(ctk.CTk):
         updates or adds some properties regarding the scraped data such as
         `len(total_images)`, `size(total_images)`, `links(all_images)` etc
         """
+        # * Get the number of total images
         self.total_images = len(self.scraped_data)
-
+        
         # * Calculate the size of total images
         total_bytes = 0.0
         for image in self.scraped_data:
             size_unit = image['size'].split()
-            total_bytes += self.backend.to_bytes(float(size_unit[0]), size_unit[1])
-            
+            total_bytes += self.backend.to_bytes(
+                float(size_unit[0]), size_unit[1])
+        self.total_size = self.backend.to_human_readable_storage(total_bytes)
         
 
     def handle_errors(self, error):
