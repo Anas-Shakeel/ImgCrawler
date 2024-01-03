@@ -17,7 +17,7 @@ class Backend:
         """
         return self.img_api.get(url)
 
-    def to_bytes(self, _size=137.5, _unit="MB"):
+    def to_bytes(self, _size: float, _unit: str):
         """
         ### To Bytes
         Converts other Data Storage units to bytes
