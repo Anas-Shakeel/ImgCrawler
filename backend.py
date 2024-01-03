@@ -45,7 +45,6 @@ class Backend:
         if not (unit and unit.isalpha() and len(unit) in [1, 2]):
             raise ValueError(f"'{unit}' is not a valid unit")
 
-        # ? Calculate bytes
         # Unit Factors
         factors = {
             "B": 1,
@@ -54,7 +53,7 @@ class Backend:
             "GB": 1024 ** 3,
         }
 
-        # ? Calculate bytes
+        # Calculate and return bytes
         return factors[unit] * size
 
     def to_human_readable_storage(self, bytes_size=1441075):
