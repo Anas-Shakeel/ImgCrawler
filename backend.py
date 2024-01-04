@@ -3,6 +3,10 @@ Handles all the backend logics
 """
 
 from imgpile import ImgPile
+import requests
+import os
+from os import mkdir
+from os import path
 
 
 class Backend:
@@ -44,7 +48,7 @@ class Backend:
             "MB": 1024 ** 2,
             "GB": 1024 ** 3,
         }
-        
+
         # Calculate and return bytes
         return round(factors[unit] * size, 3)
 
@@ -65,6 +69,25 @@ class Backend:
 
         # Adjust the format to avoid unnecessary decimal places for integers
         formatted_size = "{:.2f}".format(size).rstrip('0').rstrip('.')
-        
+
         return f"{formatted_size} {units[unit_index]}"
-    
+
+    def download_images(self, image_url, filename, save_path):
+        """Downloads all images in local storage"""
+        # Create folder
+        if path.exists(save_path):
+            print("Path Already Exists!")
+            pass
+        else:
+            os.mkdir(save_path)
+
+        # directory
+        directory = path.join(save_path, filename)
+
+        # If file does not exists, download
+        if not path.exists(directory):
+            # Download the image content
+            raw_image_data = requests.get(image_url).content
+            # Save image
+            with open(directory, 'wb') as img:
+                img.write(raw_image_data)
