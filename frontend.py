@@ -26,9 +26,6 @@ class App(ctk.CTk):
         self.total_images = None
         self.total_size = None
 
-        # Will hold Selected images' urls
-        # self.selected_images = []
-
         # * Root Configuration
         self.title(f"{self.PROGRAM_NAME} {self.PROGRAM_VER}")
         # self.geometry("1024x768+10+10")
@@ -71,7 +68,7 @@ class App(ctk.CTk):
         for child in self.fields_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
 
-        # * Output Field
+        # * Output View
         self.view_frame = ctk.CTkScrollableFrame(
             self.mainframe, label_text="Images", orientation="horizontal")
         self.view_frame.grid(row=1, column=0, pady=10, sticky="new")
@@ -126,18 +123,22 @@ class App(ctk.CTk):
         # Disable button
         self.button_scrape.configure(text="Please wait...", state=tk.DISABLED)
 
+        # Create log window
+        self.logwindow = LogWindow(master=self, title="Crawl Log")
+        self.after(0, lambda: self.logwindow.focus())
+
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
-            url,))
+            url, self.logwindow))
         scraping_thread.start()
 
-    def scrape_in_background(self, url):
+    def scrape_in_background(self, url, logwindow):
         """ 
         ### Scrape in Background
         scrape the data in background (new thread)
         """
         try:
-            result = self.backend.get_response(url)
+            result = self.backend.get_response(url, logwindow)
             self.after(0, self.update_gui, result)
         except Exception as e:
             # In-case of errors, call error handler
@@ -153,8 +154,13 @@ class App(ctk.CTk):
 
         # Save the response "class"ically :)
         self.scraped_data = result
+        self.logwindow.write(f"[Success] Images Extracted.\n")
         # Do some calculations regarding the data
         self.update_properties()
+        self.logwindow.write(f"\n[Info] Total Extracted Datapoints: {self.total_images}")
+        self.logwindow.write(f"\n[Info] Total Size Of Images: {self.total_size}")
+        self.logwindow.write(f"\n[Info] Showing JSON:\n")
+        self.logwindow.write(json.dumps(self.scraped_data, indent=4))
 
         # show images
         self.show_image_names()
@@ -240,3 +246,29 @@ class ImageBox(ctk.CTkFrame):
             self, text="", image=self.image, width=200, height=200)
         self.canvas.image = self.image
         self.canvas.grid(row=0, column=0, padx=5, pady=5)
+
+
+class LogWindow(ctk.CTkToplevel):
+    def __init__(self, master, title, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+        
+        # Window Configuration
+        self.title(title)
+        self.geometry("500x350+25+25")
+        # self.after(0, lambda: self.state("zoomed"))
+        # self.after(0, )
+
+        self.text_area = ctk.CTkTextbox(self, font=("", 18))
+        self.text_area.grid(sticky="news", padx=10, pady=10)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        
+    def write(self, text):
+        """ Write `text` in the textarea """
+        self.text_area.configure(state="normal")
+        self.text_area.insert(ctk.END, text)
+        self.text_area.configure(state="disabled")
+
+    def close_window(self):
+        """ Destroy this widget """
+        self.destroy()
