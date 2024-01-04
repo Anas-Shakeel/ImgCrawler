@@ -71,10 +71,6 @@ class App(ctk.CTk):
         self.view_frame.grid(row=1, column=0, pady=10, sticky="nsew")
         self.mainframe.rowconfigure(1, weight=1)
 
-        for i in range(10):
-            ctk.CTkCheckBox(self.view_frame, text=str(i)).grid(
-                sticky="w", padx=5, pady=3)
-
         # * Other inputs Frame
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
         self.other_frame.grid(row=2, sticky="we")
@@ -166,6 +162,9 @@ class App(ctk.CTk):
         # Do some calculations regarding the data
         self.update_properties()
 
+        # show images
+        self.show_images()
+
         # """
         # Dump Json data
         with open("temp.json", "w") as tempfile:
@@ -194,6 +193,11 @@ class App(ctk.CTk):
             total_bytes += self.backend.to_bytes(
                 float(size_unit[0]), size_unit[1])
         self.total_size = self.backend.to_human_readable_storage(total_bytes)
+
+    def show_images(self):
+        for image in self.scraped_data:
+            ctk.CTkLabel(self.view_frame, text=image['title']).grid(
+                sticky="w", padx=5, pady=3)
 
     def handle_errors(self, error):
         """ Handles errors """
