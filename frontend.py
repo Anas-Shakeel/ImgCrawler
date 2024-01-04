@@ -287,21 +287,3 @@ class LogWindow(ctk.CTkToplevel):
     def close_window(self):
         """ Destroy this widget """
         self.destroy()
-
-
-class DownloadDialog(ctk.CTkToplevel):
-    def __init__(self, master, title, download_callback, *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
-
-        # Window Configuration
-        self.title(title)
-        self.geometry("500x350+25+25")
-        self.grab_set()
-        self.after(0, lambda: self.focus_set())
-
-    def get_values(self):
-        """ Get values of options """
-        ...
-
-    def download_image(self):
-        ...
