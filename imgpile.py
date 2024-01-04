@@ -140,6 +140,7 @@ class ImgPile:
             "title": title,
             "size": image_size,
             "resolution": image_res,
+            "extension": f".{image_type.lower()}",
             "image_type": image_type,
             "views": views,
             "likes": likes,
