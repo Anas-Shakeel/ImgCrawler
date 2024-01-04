@@ -180,7 +180,7 @@ class App(ctk.CTk):
         # messagebox.showinfo("Success", "Data Extracted Successfully!")
 
         # Update View_frame's title
-        self.view_frame.configure()
+        self.view_frame.configure(label_text=f"{self.total_images} images were scraped")
 
     def update_properties(self):
         """ 
