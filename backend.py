@@ -75,10 +75,7 @@ class Backend:
     def download_images(self, image_url, filename, save_path):
         """Downloads all images in local storage"""
         # Create folder
-        if path.exists(save_path):
-            print("Path Already Exists!")
-            pass
-        else:
+        if not path.exists(save_path):
             os.mkdir(save_path)
 
         # directory
