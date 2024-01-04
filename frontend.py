@@ -8,6 +8,9 @@ from tkinter import messagebox
 from backend import Backend
 import json
 from threading import Thread
+import requests
+from io import BytesIO
+from PIL import ImageTk, Image
 
 
 class App(ctk.CTk):
@@ -163,7 +166,7 @@ class App(ctk.CTk):
         self.update_properties()
 
         # show images
-        self.show_images()
+        self.show_image_names()
 
         # """
         # Dump Json data
@@ -194,10 +197,12 @@ class App(ctk.CTk):
                 float(size_unit[0]), size_unit[1])
         self.total_size = self.backend.to_human_readable_storage(total_bytes)
 
-    def show_images(self):
+    def show_image_names(self):
+        # """
         for image in self.scraped_data:
             ctk.CTkLabel(self.view_frame, text=image['title']).grid(
                 sticky="w", padx=5, pady=3)
+        # """
 
     def handle_errors(self, error):
         """ Handles errors """
