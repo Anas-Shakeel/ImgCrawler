@@ -81,17 +81,6 @@ class App(ctk.CTk):
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
         self.other_frame.grid(row=2, sticky="we")
 
-        self.button_select_all = ctk.CTkButton(self.other_frame,
-                                               text="Select All",
-                                               width=90, height=35,
-                                               )
-        self.button_select_all.grid(row=0, column=0)
-
-        self.button_deselect_all = ctk.CTkButton(self.other_frame,
-                                                 text="Deselect All",
-                                                 width=90, height=35)
-        self.button_deselect_all.grid(row=0, column=1)
-
         self.button_download = ctk.CTkButton(self.other_frame,
                                              text="Download",
                                              width=90, height=35,)
@@ -230,6 +219,8 @@ class App(ctk.CTk):
 
 
 class ImageBox(ctk.CTkFrame):
+    """ An Imagebox that takes `thumb_url` and displays it """
+
     def __init__(self, master, thumb_url,  *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
