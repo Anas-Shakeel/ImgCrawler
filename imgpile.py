@@ -26,7 +26,7 @@ class ImgPile:
 
         self.logwindow.write(f"[Info] {len(pages)} Pages Extracted...\n")
 
-        self.logwindow.write(f"[Info] Extracting Images\n")
+        self.logwindow.write(f"\n[Info] Extracting Images\n")
         # Stores all pages & images
         master_data = []
         # Iterate through every page and extract image links
