@@ -1,16 +1,12 @@
-"""
-### Frontend for ImgPile Scraper
-"""
 import tkinter as tk
 import customtkinter as ctk
-from tkinter import ttk
 from tkinter import messagebox
 from backend import Backend
 import json
 from threading import Thread
 import requests
 from io import BytesIO
-from PIL import ImageTk, Image
+from PIL import Image
 
 
 class App(ctk.CTk):
@@ -80,7 +76,8 @@ class App(ctk.CTk):
 
         self.button_download = ctk.CTkButton(self.other_frame,
                                              text="Download",
-                                             width=90, height=35,)
+                                             width=90, height=35,
+                                             command=self.download)
         self.button_download.grid(row=0, column=2, sticky="e")
         self.other_frame.columnconfigure((2,), weight=1)
 
@@ -148,32 +145,22 @@ class App(ctk.CTk):
         # Enable scrape button
         self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
 
-        # * Change the title of view_frame
-        ...
-
         # Save the response "class"ically :)
         self.scraped_data = result
         self.logwindow.write(f"[Success] Images Extracted.\n")
         # Do some calculations regarding the data
         self.update_properties()
-        self.logwindow.write(f"\n[Info] Total Extracted Datapoints: {self.total_images}")
-        self.logwindow.write(f"\n[Info] Total Size Of Images: {self.total_size}")
+        self.logwindow.write(
+            f"\n[Info] Total Extracted Images: {self.total_images}")
+        self.logwindow.write(
+            f"\n[Info] Total Size of Images: {self.total_size}")
         self.logwindow.write(f"\n[Info] Showing JSON:\n")
         self.logwindow.write(json.dumps(self.scraped_data, indent=4))
 
-        # show images
-        self.show_image_names()
+        # Show images in 'view_frame'
+        self.show_images()
 
-        # """
-        # Dump Json data
-        with open("temp.json", "w") as tempfile:
-            json.dump(result, tempfile, indent=4)
-        # """
-
-        # Success Info
-        # messagebox.showinfo("Success", "Data Extracted Successfully!")
-
-        # Update View_frame's title
+        # Update 'view_frame's title
         self.view_frame.configure(
             label_text=f"{self.total_images} images were scraped")
 
@@ -194,7 +181,18 @@ class App(ctk.CTk):
                 float(size_unit[0]), size_unit[1])
         self.total_size = self.backend.to_human_readable_storage(total_bytes)
 
-    def show_image_names(self):
+    def handle_errors(self, error):
+        """ Handles errors """
+        # Enable scrape button
+        self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
+
+        self.button_download.configure(text="Download", state=tk.NORMAL)
+
+        # Error info
+        messagebox.showerror(
+            "Error Occurred", f"An error occurred: {str(error)}")
+
+    def show_images(self):
         """ Start Image Displayer Thread """
         display_thread = Thread(target=self.show_images_in_background)
         display_thread.start()
@@ -205,18 +203,35 @@ class App(ctk.CTk):
             ImageBox(self.view_frame,
                      thumb_url=image['thumb_url'],).grid(row=0, column=index, padx=5, pady=5)
 
-    def handle_errors(self, error):
-        """ Handles errors """
-        # Enable scrape button
-        self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
-
-        # Error info
-        messagebox.showerror(
-            "Error Occurred", f"An error occurred: {str(error)}")
-
     def cancel_scraping(self):
         """ Cancel/Terminate the scraping thread """
         ...
+
+    def download(self):
+        """ Download the images """
+        # Disable the download button first!!!
+        self.button_download.configure(text="Please wait", state=tk.DISABLED)
+
+        savepath = "saves\\"
+        self.downloading_thread = Thread(
+            target=self.begin_dowmload, args=(savepath, ))
+        self.downloading_thread.start()
+
+    def begin_dowmload(self, save_path):
+        """ 
+        ### Begin Download
+        Start the downloading process in a new thread
+        """
+        try:
+            for image in self.scraped_data:
+                filename = image['title'] + image['extension']
+                self.backend.download_images(image['image_url'],
+                                             filename, save_path)
+        except Exception as e:
+            self.after(0, self.handle_errors, e)
+
+        finally:
+            self.button_download.configure(text="Download", state=tk.NORMAL)
 
     def exit_app(self):
         """ Method for exiting the application the right way """
@@ -250,7 +265,7 @@ class ImageBox(ctk.CTkFrame):
 class LogWindow(ctk.CTkToplevel):
     def __init__(self, master, title, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        
+
         # Window Configuration
         self.title(title)
         self.geometry("500x350+25+25")
@@ -262,7 +277,7 @@ class LogWindow(ctk.CTkToplevel):
         self.text_area.grid(sticky="news", padx=10, pady=10)
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
-        
+
     def write(self, text):
         """ Write `text` in the textarea """
         self.text_area.configure(state="normal")
@@ -272,3 +287,21 @@ class LogWindow(ctk.CTkToplevel):
     def close_window(self):
         """ Destroy this widget """
         self.destroy()
+
+
+class DownloadDialog(ctk.CTkToplevel):
+    def __init__(self, master, title, download_callback, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+
+        # Window Configuration
+        self.title(title)
+        self.geometry("500x350+25+25")
+        self.grab_set()
+        self.after(0, lambda: self.focus_set())
+
+    def get_values(self):
+        """ Get values of options """
+        ...
+
+    def download_image(self):
+        ...
