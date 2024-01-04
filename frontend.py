@@ -26,6 +26,9 @@ class App(ctk.CTk):
         self.total_images = None
         self.total_size = None
 
+        # Will hold Selected images' urls
+        self.selected_images = []
+
         # * Root Configuration
         self.title(f"{self.PROGRAM_NAME} {self.PROGRAM_VER}")
         # self.geometry("1024x768+10+10")
@@ -70,8 +73,8 @@ class App(ctk.CTk):
 
         # * Output Field
         self.view_frame = ctk.CTkScrollableFrame(
-            self.mainframe, label_text="Images")
-        self.view_frame.grid(row=1, column=0, pady=10, sticky="nsew")
+            self.mainframe, label_text="Images", orientation="horizontal")
+        self.view_frame.grid(row=1, column=0, pady=10, sticky="new")
         self.mainframe.rowconfigure(1, weight=1)
 
         # * Other inputs Frame
@@ -134,7 +137,6 @@ class App(ctk.CTk):
         # Disable button
         self.button_scrape.configure(text="Please wait...", state=tk.DISABLED)
 
-        # return
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
             url,))
@@ -175,7 +177,7 @@ class App(ctk.CTk):
         # """
 
         # Success Info
-        messagebox.showinfo("Success", "Data Extracted Successfully!")
+        # messagebox.showinfo("Success", "Data Extracted Successfully!")
 
         # Update View_frame's title
         self.view_frame.configure()
@@ -198,11 +200,25 @@ class App(ctk.CTk):
         self.total_size = self.backend.to_human_readable_storage(total_bytes)
 
     def show_image_names(self):
-        # """
+        """ Start Image Displayer Thread """
+        display_thread = Thread(target=self.show_images_in_background)
+        display_thread.start()
+
+    def show_images_in_background(self):
+        """ Displays images in `view_frame` in background """
         for image in self.scraped_data:
-            ctk.CTkLabel(self.view_frame, text=image['title']).grid(
-                sticky="w", padx=5, pady=3)
-        # """
+            ImageCheckBox(self.view_frame,
+                          image_url=image['image_url'],
+                          thumb_url=image['thumb_url'],
+                          image_name=image['title'],
+                          selection_callback=self.handle_selection).pack(side=ctk.LEFT)
+
+    def handle_selection(self, image_url, is_selected):
+        """ CALLBACK Function to call [outside this class]"""
+        if is_selected:
+            self.selected_images.append(image_url)
+        else:
+            self.selected_images.remove(image_url)
 
     def handle_errors(self, error):
         """ Handles errors """
@@ -215,8 +231,52 @@ class App(ctk.CTk):
 
     def cancel_scraping(self):
         """ Cancel/Terminate the scraping thread """
-        ...
+        print(self.selected_images)
 
     def exit_app(self):
         """ Method for exiting the application the right way """
         self.destroy()
+
+
+class ImageCheckBox(ctk.CTkFrame):
+    def __init__(self, master, thumb_url, image_url, image_name, selection_callback, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+
+        self.thumb_url = thumb_url
+        self.image_url = image_url
+        self.image_name = image_name
+        self.selection_var = ctk.IntVar()
+        self.selection_var.set(1)
+        self.selection_callback = selection_callback
+
+        self.load_image()
+        self.create_widgets()
+        
+        for child in self.winfo_children():
+            child.grid_configure(padx=10, pady=10, )
+
+    def load_image(self):
+        raw_data = requests.get(self.thumb_url).content
+        image = Image.open(BytesIO(raw_data))
+        
+        self.image = ctk.CTkImage(image, size=(100, 100))
+
+        self.image_ref = self.image
+
+    def create_widgets(self):
+        self.canvas = ctk.CTkLabel(
+            self, text="", image=self.image, width=100, height=100)
+        self.canvas.image = self.image_ref
+        self.canvas.grid(row=0, column=0)
+        # self.canvas.grid_configure(padx=10, pady=10, )
+
+        self.checkbox = ctk.CTkCheckBox(
+            self, text=self.image_name, variable=self.selection_var, border_width=1, command=self.update_selection)
+        self.checkbox.grid(row=1, column=0)
+
+    def update_selection(self):
+        if self.selection_callback:
+            self.selection_callback(self.image_url, self.is_selected())
+
+    def is_selected(self):
+        return bool(self.selection_var.get())
