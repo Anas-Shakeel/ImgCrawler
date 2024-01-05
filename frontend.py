@@ -74,7 +74,7 @@ class App(ctk.CTk):
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
         self.other_frame.grid(row=2, sticky="we")
 
-        self.dir_field = DirectoryField(self.other_frame)
+        self.dir_field = DirectoryField(self.other_frame, minsize=350)
         self.dir_field.grid(row=0, column=0, sticky="e")
 
         self.button_download = ctk.CTkButton(self.other_frame,
@@ -293,22 +293,28 @@ class LogWindow(ctk.CTkToplevel):
 
 
 class DirectoryField(ctk.CTkFrame):
-    def __init__(self, master, *args, **kwargs):
+    def __init__(self, master, minsize, *args, **kwargs):
         super().__init__(master, height=50, *args, **kwargs)
 
         # Entry field
-        self.dir_var = ctk.StringVar()
-        self.entry_field = ctk.CTkEntry(self, textvariable=self.dir_var)
+        self.dir_var = ""
+        self.entry_field = ctk.CTkEntry(self,
+                                        placeholder_text="Enter save location",
+                                        font=("", 16))
         self.entry_field.grid(row=0, column=0, sticky="ew")
 
         # Open File Dialog Button
         self.image = ctk.CTkImage(
-            dark_image=Image.open("assets\\directory_16px.png"))
+            dark_image=Image.open("assets\\directory_light_16px.png"))
         self.dir_button = ctk.CTkButton(
             self, text="", image=self.image, width=30, height=30, command=self.open_dialog)
         self.dir_button.grid(row=0, column=1, sticky="e")
 
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1, minsize=minsize)
+        
+        # Spacing things out
+        for child in self.winfo_children():
+            child.grid_configure(padx=2, pady=1)
 
     def open_dialog(self):
         ...
