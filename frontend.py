@@ -247,7 +247,7 @@ class App(ctk.CTk):
         try:
             if not self.scraped_data:
                 raise ValueError("Please Scraped the images first.")
-            
+
             for image in self.scraped_data:
                 filename = image['title'] + image['extension']
                 self.backend.download_images(image['image_url'],
@@ -315,6 +315,11 @@ class LogWindow(ctk.CTkToplevel):
 
 
 class DirectoryField(ctk.CTkFrame):
+    """ 
+    ### Directory Field Widget
+    A Custom-Widget used to take directory input from user
+    """
+    
     def __init__(self, master, minsize, *args, **kwargs):
         super().__init__(master, height=50, *args, **kwargs)
 
