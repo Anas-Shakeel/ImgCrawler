@@ -8,7 +8,8 @@ import os
 from os import mkdir
 from os import path
 import json
-import csv
+import pandas as pd
+from io import StringIO
 
 
 class Backend:
@@ -96,18 +97,23 @@ class Backend:
         ### Download DATA
         Downloads the `data` with the `filename` in `format` format in `save_path`
         """
+        if not path.isdir(save_path):
+            raise ValueError("save_path: value must be an existing directory path.")
 
         save_dir = path.join(save_path, filename)
 
         if fileformat == "JSON":
-            # Download as json
+            # * Download as json
             with open(save_dir+".json", "w") as jsonfile:
                 json.dump(data, jsonfile, indent=4)
 
         elif fileformat == "CSV":
-            # Download as CSV
-            print("Soon to be implemented")
-            ...
+            # * Download as CSV
+            # Convert to Pandas Dataframe
+            df = pd.DataFrame(data)
+            # Save Dataframe as CSV
+            df.to_csv(save_dir + ".csv", index=False)
+
         else:
             # Other cases
-            return
+            raise ValueError("Invalid Format Type: format must be 'JSON' or 'CSV'.")
