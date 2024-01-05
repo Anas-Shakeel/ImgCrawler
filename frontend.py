@@ -99,7 +99,6 @@ class App(ctk.CTk):
                                                   command=self.download_textual)
         self.button_download_json.grid(row=0, column=3, sticky="w")
 
-        # self.other_frame.columnconfigure((0, 1,), weight=1)
         self.other_frame.columnconfigure((0, ), weight=1)
 
         # ? Padding childs
@@ -285,8 +284,7 @@ class App(ctk.CTk):
             # NOTHING IN THERE!
             return
 
-        # Create a filename
-        ...
+        # Filename for the files
         filename = "Demo"
 
         save_path = self.dir_field.get_dir()
