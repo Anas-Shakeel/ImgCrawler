@@ -4,6 +4,7 @@ from customtkinter import filedialog
 from tkinter import messagebox
 from backend import Backend
 import json
+from os.path import normpath
 from threading import Thread
 import requests
 from io import BytesIO
@@ -75,7 +76,7 @@ class App(ctk.CTk):
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
         self.other_frame.grid(row=2, sticky="we")
 
-        self.dir_field = DirectoryField(self.other_frame, minsize=300)
+        self.dir_field = DirectoryField(self.other_frame)
         self.dir_field.grid(row=0, column=0, sticky="ew")
 
         self.button_download = ctk.CTkButton(self.other_frame,
@@ -83,19 +84,21 @@ class App(ctk.CTk):
                                              width=90, height=35,
                                              command=self.download)
         self.button_download.grid(row=0, column=1, sticky="w")
-        
+
+        self.options_var = ctk.StringVar(value="JSON")
+        self.options_menu = ctk.CTkOptionMenu(self.other_frame,
+                                              width=100, height=35,
+                                              variable=self.options_var,
+                                              values=["JSON", "CSV"],
+                                              )
+        self.options_menu.grid(row=0, column=2, sticky="w")
+
         self.button_download_json = ctk.CTkButton(self.other_frame,
-                                                  text="Download JSON",
+                                                  text="Download Data",
                                                   width=90, height=35,
-                                                  command=self.download_json)
-        self.button_download_json.grid(row=0, column=2, sticky="w")
-        
-        self.button_download_csv = ctk.CTkButton(self.other_frame,
-                                                  text="Download CSV",
-                                                  width=90, height=35,
-                                                  command=self.download_csv)
-        self.button_download_csv.grid(row=0, column=3, sticky="w")
-        
+                                                  command=self.download_textual)
+        self.button_download_json.grid(row=0, column=3, sticky="w")
+
         # self.other_frame.columnconfigure((0, 1,), weight=1)
         self.other_frame.columnconfigure((0, ), weight=1)
 
@@ -272,19 +275,28 @@ class App(ctk.CTk):
         finally:
             self.button_download.configure(text="Download", state=tk.NORMAL)
 
-    def download_json(self):
+    def download_textual(self):
         """ 
-        ### Download Json
-        Download the `Json` scraped data as json file.
+        ### Download Textual
+        Download the scraped data as a JSON/CSV file.
         """
-        ...
+        file_format = self.options_var.get()
+        if not file_format:
+            # NOTHING IN THERE!
+            return
 
-    def download_csv(self):
-        """ 
-        ### Download CSV
-        Download the `CSV` scraped data as CSV file.
-        """
+        # Create a filename
         ...
+        filename = "Demo"
+
+        save_path = self.dir_field.get_dir()
+
+        data_downloading_thread = Thread(target=self.backend.download_data,
+                                         args=(self.scraped_data,
+                                               file_format,
+                                               filename,
+                                               save_path))
+        data_downloading_thread.start()
 
     def exit_app(self):
         """ Method for exiting the application the right way """
@@ -347,8 +359,8 @@ class DirectoryField(ctk.CTkFrame):
     ### Directory Field Widget
     A Custom-Widget used to take directory input from user
     """
-    
-    def __init__(self, master, minsize, *args, **kwargs):
+
+    def __init__(self, master, *args, **kwargs):
         super().__init__(master, height=50, *args, **kwargs)
 
         # Entry field
@@ -365,7 +377,7 @@ class DirectoryField(ctk.CTkFrame):
             self, text="", image=self.image, width=30, height=30, command=self.open_dialog)
         self.dir_button.grid(row=0, column=1, sticky="e")
 
-        self.grid_columnconfigure(0, weight=1, minsize=minsize)
+        self.grid_columnconfigure(0, weight=1)
 
         # Spacing things out
         for child in self.winfo_children():
@@ -381,7 +393,7 @@ class DirectoryField(ctk.CTkFrame):
             if dir_:
                 # Insert into entry field
                 self.entry_field.delete(0, tk.END)
-                self.entry_field.insert("1", dir_)
+                self.entry_field.insert("1", normpath(dir_))
 
         except Exception as e:
             print(f"error: {e}")
