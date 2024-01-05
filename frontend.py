@@ -66,15 +66,20 @@ class App(ctk.CTk):
         for child in self.fields_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
 
-        # * Output View
+        # * View Frame
         self.view_frame = ctk.CTkScrollableFrame(
-            self.mainframe, label_text="Images", orientation="horizontal")
+            self.mainframe, label_text="Images", orientation="horizontal", label_font=("", 18))
         self.view_frame.grid(row=1, column=0, pady=10, sticky="new")
         self.mainframe.rowconfigure(1, weight=1)
+        
+        # * DATA Frame
+        self.data_frame = ctk.CTkFrame(self.mainframe)
+        self.data_frame.grid(row=2, column=0, sticky="news")
+        self.data_frame.rowconfigure(2, weight=1)
 
         # * Other inputs Frame
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
-        self.other_frame.grid(row=2, sticky="we")
+        self.other_frame.grid(row=3, sticky="we")
 
         self.dir_field = DirectoryField(self.other_frame)
         self.dir_field.grid(row=0, column=0, sticky="ew")
@@ -101,7 +106,11 @@ class App(ctk.CTk):
 
         self.other_frame.columnconfigure((0, ), weight=1)
 
-        # ? Padding childs
+        # ? Padding mainframe's childs
+        for child in self.mainframe.winfo_children():
+            child.grid_configure(padx=5, pady=5)
+        
+        # ? Padding otherframe's childs
         for child in self.other_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
 
