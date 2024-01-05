@@ -98,7 +98,8 @@ class Backend:
         Downloads the `data` with the `filename` in `format` format in `save_path`
         """
         if not path.isdir(save_path):
-            raise ValueError("save_path: value must be an existing directory path.")
+            raise ValueError(
+                "save_path: value must be an existing directory path.")
 
         save_dir = path.join(save_path, filename)
 
@@ -116,4 +117,5 @@ class Backend:
 
         else:
             # Other cases
-            raise ValueError("Invalid Format Type: format must be 'JSON' or 'CSV'.")
+            raise ValueError(
+                "Invalid Format Type: format must be 'JSON' or 'CSV'.")
