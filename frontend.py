@@ -67,15 +67,30 @@ class App(ctk.CTk):
             child.grid_configure(padx=10, pady=10)
 
         # * View Frame
-        self.view_frame = ctk.CTkScrollableFrame(
-            self.mainframe, label_text="Images", orientation="horizontal", label_font=("", 18))
-        self.view_frame.grid(row=1, column=0, pady=10, sticky="new")
-        self.mainframe.rowconfigure(1, weight=1)
-        
+        self.view_frame = ctk.CTkScrollableFrame(self.mainframe,
+                                                 label_text="Images",
+                                                 label_font=("", 18),
+                                                 orientation="horizontal")
+        self.view_frame.grid(row=1, column=0, sticky="new")
+        # self.mainframe.rowconfigure(1, weight=1)
+
         # * DATA Frame
         self.data_frame = ctk.CTkFrame(self.mainframe)
         self.data_frame.grid(row=2, column=0, sticky="news")
-        self.data_frame.rowconfigure(2, weight=1)
+        self.mainframe.rowconfigure(2, weight=1)
+
+        self.textbox_log = TextBoxFrame(
+            self.data_frame, label="Log View", font=("", 18))
+        self.textbox_log.grid(row=0, column=0, sticky="nsew")
+
+        self.textbox_api_data = TextBoxFrame(
+            self.data_frame, label="API Data", font=("", 18))
+        self.textbox_api_data.grid(row=0, column=1, sticky="nsew")
+
+        # Making it Resizable
+        self.data_frame.columnconfigure(0, weight=1)
+        self.data_frame.columnconfigure(1, weight=1)
+        self.data_frame.rowconfigure(0, weight=1)
 
         # * Other inputs Frame
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
@@ -109,7 +124,7 @@ class App(ctk.CTk):
         # ? Padding mainframe's childs
         for child in self.mainframe.winfo_children():
             child.grid_configure(padx=5, pady=5)
-        
+
         # ? Padding otherframe's childs
         for child in self.other_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
@@ -412,3 +427,34 @@ class DirectoryField(ctk.CTkFrame):
         """
         return self.entry_field.get()
         # print(self.entry_field.get())
+
+
+class TextBoxFrame(ctk.CTkFrame):
+    """ 
+    ### TextBox Frame
+    A Custom-Widget used to create a textbox frame
+    """
+
+    def __init__(self, master, width=200, label="TextBoxFrame", font=None, *args, **kwargs):
+        super().__init__(master, width, bg_color="transparent",  *args, **kwargs)
+
+        ctk.CTkLabel(self, text=label, font=("", 18),
+                     height=10,
+                     fg_color="#393939",
+                     corner_radius=4,
+                     ).grid(row=0, column=0, columnspan=2, ipadx=5, ipady=5, padx=5, pady=2, sticky="ew")
+
+        self.text_area = ctk.CTkTextbox(self, font=font)
+        self.text_area.grid(row=1, column=0, columnspan=2,
+                            sticky="news", padx=5, pady=2)
+
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(1, weight=1)
+
+    def write(self, index1, index2, data):
+        """ 
+        ### Write
+        Write `data` into the textbox at range of `index1` - `index2`
+        """
+        ...
