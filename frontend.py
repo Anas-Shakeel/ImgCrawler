@@ -186,15 +186,28 @@ class App(ctk.CTk):
         self.total_size = self.backend.to_human_readable_storage(total_bytes)
 
     def handle_errors(self, error):
-        """ Handles errors """
+        """
+        ### Handles errors
+        handle errors which occur in scraping process 
+        """
         # Enable scrape button
         self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
 
+        # Show Error Dialog
+        messagebox.showerror(
+            "Scraping Failed", f"An error occurred: {str(error)}")
+
+    def handle_download_errors(self, error_message):
+        """ 
+        ### Handle Download Errors
+        handle errors which occur in downloading process
+        """
+        # Enable download button
         self.button_download.configure(text="Download", state=tk.NORMAL)
 
-        # Error info
+        # Show Error Dialog
         messagebox.showerror(
-            "Error Occurred", f"An error occurred: {str(error)}")
+            "Downloading Failed", f"{error_message}")
 
     def show_images(self):
         """ Start Image Displayer Thread """
@@ -216,7 +229,11 @@ class App(ctk.CTk):
         # Disable the download button first!!!
         self.button_download.configure(text="Please wait", state=tk.DISABLED)
 
-        savepath = "saves\\"
+        savepath = self.dir_field.get_dir()
+        if not savepath:
+            self.handle_download_errors("Please select a directory to save images.")
+            return
+
         self.downloading_thread = Thread(
             target=self.begin_dowmload, args=(savepath, ))
         self.downloading_thread.start()
@@ -232,7 +249,7 @@ class App(ctk.CTk):
                 self.backend.download_images(image['image_url'],
                                              filename, save_path)
         except Exception as e:
-            self.after(0, self.handle_errors, e)
+            self.after(0, self.handle_download_errors, e)
 
         finally:
             self.button_download.configure(text="Download", state=tk.NORMAL)
