@@ -231,7 +231,8 @@ class App(ctk.CTk):
 
         savepath = self.dir_field.get_dir()
         if not savepath:
-            self.handle_download_errors("Please select a directory to save images.")
+            self.after(0, self.handle_download_errors,
+                       "Please select a directory to save images.")
             return
 
         self.downloading_thread = Thread(
@@ -244,6 +245,9 @@ class App(ctk.CTk):
         Start the downloading process in a new thread
         """
         try:
+            if not self.scraped_data:
+                raise ValueError("Please Scraped the images first.")
+            
             for image in self.scraped_data:
                 filename = image['title'] + image['extension']
                 self.backend.download_images(image['image_url'],
@@ -329,7 +333,7 @@ class DirectoryField(ctk.CTkFrame):
         self.dir_button.grid(row=0, column=1, sticky="e")
 
         self.grid_columnconfigure(0, weight=1, minsize=minsize)
-        
+
         # Spacing things out
         for child in self.winfo_children():
             child.grid_configure(padx=2, pady=1)
