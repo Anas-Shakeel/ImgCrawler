@@ -7,6 +7,8 @@ import requests
 import os
 from os import mkdir
 from os import path
+import json
+import csv
 
 
 class Backend:
@@ -88,3 +90,24 @@ class Backend:
             # Save image
             with open(directory, 'wb') as img:
                 img.write(raw_image_data)
+
+    def download_data(self, data, fileformat, filename, save_path):
+        """ 
+        ### Download DATA
+        Downloads the `data` with the `filename` in `format` format in `save_path`
+        """
+
+        save_dir = path.join(save_path, filename)
+
+        if fileformat == "JSON":
+            # Download as json
+            with open(save_dir+".json", "w") as jsonfile:
+                json.dump(data, jsonfile, indent=4)
+
+        elif fileformat == "CSV":
+            # Download as CSV
+            print("Soon to be implemented")
+            ...
+        else:
+            # Other cases
+            return
