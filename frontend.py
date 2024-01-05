@@ -1,5 +1,6 @@
 import tkinter as tk
 import customtkinter as ctk
+from customtkinter import filedialog
 from tkinter import messagebox
 from backend import Backend
 import json
@@ -317,11 +318,24 @@ class DirectoryField(ctk.CTkFrame):
             child.grid_configure(padx=2, pady=1)
 
     def open_dialog(self):
-        ...
+        """
+        ### Open Directory Dialog
+        Opens a directory dialog and returns the user's selected dir.
+        """
+        try:
+            dir_ = filedialog.askdirectory()
+            if dir_:
+                # Insert into entry field
+                self.entry_field.delete(0, tk.END)
+                self.entry_field.insert("1", dir_)
+
+        except Exception as e:
+            print(f"error: {e}")
 
     def get_dir(self):
         """ 
         ### Get Directory
         Returns the directory entered in the directory field
         """
-        return self.dir_var.get()
+        return self.entry_field.get()
+        # print(self.entry_field.get())
