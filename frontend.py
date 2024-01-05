@@ -74,12 +74,15 @@ class App(ctk.CTk):
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
         self.other_frame.grid(row=2, sticky="we")
 
+        self.dir_field = DirectoryField(self.other_frame)
+        self.dir_field.grid(row=0, column=0, sticky="e")
+
         self.button_download = ctk.CTkButton(self.other_frame,
                                              text="Download",
                                              width=90, height=35,
                                              command=self.download)
-        self.button_download.grid(row=0, column=2, sticky="e")
-        self.other_frame.columnconfigure((2,), weight=1)
+        self.button_download.grid(row=0, column=1, sticky="e")
+        self.other_frame.columnconfigure((0, 1,), weight=1)
 
         # ? Padding childs
         for child in self.other_frame.winfo_children():
@@ -287,3 +290,32 @@ class LogWindow(ctk.CTkToplevel):
     def close_window(self):
         """ Destroy this widget """
         self.destroy()
+
+
+class DirectoryField(ctk.CTkFrame):
+    def __init__(self, master, *args, **kwargs):
+        super().__init__(master, height=50, *args, **kwargs)
+
+        # Entry field
+        self.dir_var = ctk.StringVar()
+        self.entry_field = ctk.CTkEntry(self, textvariable=self.dir_var)
+        self.entry_field.grid(row=0, column=0, sticky="ew")
+
+        # Open File Dialog Button
+        self.image = ctk.CTkImage(
+            dark_image=Image.open("assets\\directory_16px.png"))
+        self.dir_button = ctk.CTkButton(
+            self, text="", image=self.image, width=30, height=30, command=self.open_dialog)
+        self.dir_button.grid(row=0, column=1, sticky="e")
+
+        self.grid_columnconfigure(0, weight=1)
+
+    def open_dialog(self):
+        ...
+
+    def get_dir(self):
+        """ 
+        ### Get Directory
+        Returns the directory entered in the directory field
+        """
+        return self.dir_var.get()
