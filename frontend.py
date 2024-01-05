@@ -75,15 +75,29 @@ class App(ctk.CTk):
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
         self.other_frame.grid(row=2, sticky="we")
 
-        self.dir_field = DirectoryField(self.other_frame, minsize=350)
-        self.dir_field.grid(row=0, column=0, sticky="e")
+        self.dir_field = DirectoryField(self.other_frame, minsize=300)
+        self.dir_field.grid(row=0, column=0, sticky="ew")
 
         self.button_download = ctk.CTkButton(self.other_frame,
-                                             text="Download",
+                                             text="Download Images",
                                              width=90, height=35,
                                              command=self.download)
-        self.button_download.grid(row=0, column=1, sticky="e")
-        self.other_frame.columnconfigure((0, 1,), weight=1)
+        self.button_download.grid(row=0, column=1, sticky="w")
+        
+        self.button_download_json = ctk.CTkButton(self.other_frame,
+                                                  text="Download JSON",
+                                                  width=90, height=35,
+                                                  command=self.download_json)
+        self.button_download_json.grid(row=0, column=2, sticky="w")
+        
+        self.button_download_csv = ctk.CTkButton(self.other_frame,
+                                                  text="Download CSV",
+                                                  width=90, height=35,
+                                                  command=self.download_csv)
+        self.button_download_csv.grid(row=0, column=3, sticky="w")
+        
+        # self.other_frame.columnconfigure((0, 1,), weight=1)
+        self.other_frame.columnconfigure((0, ), weight=1)
 
         # ? Padding childs
         for child in self.other_frame.winfo_children():
@@ -257,6 +271,20 @@ class App(ctk.CTk):
 
         finally:
             self.button_download.configure(text="Download", state=tk.NORMAL)
+
+    def download_json(self):
+        """ 
+        ### Download Json
+        Download the `Json` scraped data as json file.
+        """
+        ...
+
+    def download_csv(self):
+        """ 
+        ### Download CSV
+        Download the `CSV` scraped data as CSV file.
+        """
+        ...
 
     def exit_app(self):
         """ Method for exiting the application the right way """
