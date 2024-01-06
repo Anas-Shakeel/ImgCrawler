@@ -317,6 +317,16 @@ class App(ctk.CTk):
         """
         PopupDialog(self, "Custom Dialog", "Press 'OK' to close the dialog.")
 
+    def get_screen_center(self):
+        """
+        ### Get Screen Center
+        returns the center of the screen.
+        """
+        x = self.winfo_screenwidth() // 2
+        y = self.winfo_screenheight() // 2
+
+        return x, y
+
     def exit_app(self):
         """ Method for exiting the application the right way """
         self.destroy()
