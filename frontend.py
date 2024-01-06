@@ -438,13 +438,12 @@ class PopupDialog(ctk.CTkToplevel):
 
         self.overrideredirect(1)
         self.title(title)
-        w, h = self.center_of_screen()
-        geo = f"300x150+{w-300//2}+{h-150//2}"
-        self.geometry(geo)
+        self.place_in_center(300, 150)
 
         # Set up widgets
-        self.message_label = ctk.CTkLabel(self, text=geo, padx=20, pady=20)
-        self.ok_button = ctk.CTkButton(self, text="OK", command=self.on_ok)
+        self.message_label = ctk.CTkLabel(self, text=message, padx=20, pady=20)
+        self.ok_button = ctk.CTkButton(
+            self, text="OK", font=("", 18), command=self.on_ok)
 
         # Pack widgets
         self.message_label.pack()
@@ -456,12 +455,13 @@ class PopupDialog(ctk.CTkToplevel):
         # self.grab_set()
         parent.wait_window(self)
 
-    def center_of_screen(self):
-        """ Calculates and returns the center of the screen """
-        w = self.winfo_screenwidth() // 2
-        h = self.winfo_screenheight() // 2
+    def place_in_center(self, width, height):
+        """ Places `self` in the center of the screen """
+        x = self.winfo_screenwidth() // 2 - width // 2
+        y = self.winfo_screenheight() // 2 - height // 2
 
-        return w, h
+        geo_string = f"{width}x{height}+{x}+{y}"
+        self.geometry(geo_string)
 
     def on_ok(self):
         self.destroy()
