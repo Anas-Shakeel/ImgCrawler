@@ -72,7 +72,6 @@ class App(ctk.CTk):
                                                  label_font=("", 18),
                                                  orientation="horizontal")
         self.view_frame.grid(row=1, column=0, sticky="new")
-        # self.mainframe.rowconfigure(1, weight=1)
 
         # * DATA Frame
         self.data_frame = ctk.CTkFrame(self.mainframe)
@@ -299,7 +298,6 @@ class App(ctk.CTk):
         """ 
         ### Download Textual
         Download the scraped data as a JSON/CSV file.
-        """
         file_format = self.options_var.get()
         if not file_format:
             # NOTHING IN THERE!
@@ -316,6 +314,8 @@ class App(ctk.CTk):
                                                filename,
                                                save_path))
         data_downloading_thread.start()
+        """
+        PopupDialog(self, "Custom Dialog", "Press 'OK' to close the dialog.")
 
     def exit_app(self):
         """ Method for exiting the application the right way """
@@ -430,3 +430,38 @@ class TextBoxFrame(ctk.CTkFrame):
         self.text_area.configure(state="normal")
         self.text_area.insert(ctk.END, data)
         self.text_area.configure(state="disabled")
+
+
+class PopupDialog(ctk.CTkToplevel):
+    def __init__(self, parent, title, message):
+        super().__init__(parent)
+
+        self.overrideredirect(1)
+        self.title(title)
+        w, h = self.center_of_screen()
+        geo = f"300x150+{w-300//2}+{h-150//2}"
+        self.geometry(geo)
+
+        # Set up widgets
+        self.message_label = ctk.CTkLabel(self, text=geo, padx=20, pady=20)
+        self.ok_button = ctk.CTkButton(self, text="OK", command=self.on_ok)
+
+        # Pack widgets
+        self.message_label.pack()
+        self.ok_button.pack(pady=10)
+
+        # Make the dialog modal
+        self.transient(parent)
+        # ! uncomment this: > to prevent interactions between user and other widgets
+        # self.grab_set()
+        parent.wait_window(self)
+
+    def center_of_screen(self):
+        """ Calculates and returns the center of the screen """
+        w = self.winfo_screenwidth() // 2
+        h = self.winfo_screenheight() // 2
+
+        return w, h
+
+    def on_ok(self):
+        self.destroy()
