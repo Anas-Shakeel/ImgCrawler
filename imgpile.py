@@ -13,12 +13,12 @@ class ImgPile:
     def __init__(self) -> None:
         self.headers = {'User-Agent': 'Mozilla/5.0'}
 
-    def get(self, url: str, logwindow):
+    def get(self, url: str, logwidget):
         """ 
         ### Get
         This method will get the data you need regarding given `url`.
         """
-        self.logwindow = logwindow
+        self.logwindow = logwidget
         self.logwindow.write("[Info] Starting Page Crawl...\n")
         
         # Extract all pages

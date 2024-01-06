@@ -165,20 +165,20 @@ class App(ctk.CTk):
         self.button_scrape.configure(text="Please wait...", state=tk.DISABLED)
 
         # Create log window
-        self.logwindow = LogWindow(master=self, title="Crawl Log")
+        # self.logwindow = LogWindow(master=self, title="Crawl Log")
 
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
-            url, self.logwindow))
+            url, self.textbox_log))
         scraping_thread.start()
 
-    def scrape_in_background(self, url, logwindow):
+    def scrape_in_background(self, url, logwidget):
         """ 
         ### Scrape in Background
         scrape the data in background (new thread)
         """
         try:
-            result = self.backend.get_response(url, logwindow)
+            result = self.backend.get_response(url, logwidget)
             self.after(0, self.update_gui, result)
         except Exception as e:
             # In-case of errors, call error handler
@@ -191,15 +191,15 @@ class App(ctk.CTk):
 
         # Save the response "class"ically :)
         self.scraped_data = result
-        self.logwindow.write(f"[Success] Images Extracted.\n")
         # Do some calculations regarding the data
         self.update_properties()
-        self.logwindow.write(
+        self.textbox_log.write(
             f"\n[Info] Total Extracted Images: {self.total_images}")
-        self.logwindow.write(
-            f"\n[Info] Total Size of Images: {self.total_size}")
-        self.logwindow.write(f"\n[Info] Showing JSON:\n")
-        self.logwindow.write(json.dumps(self.scraped_data, indent=4))
+        self.textbox_log.write(
+            f"\n[Info] Total Size of Images: {self.total_size}\n")
+        self.textbox_log.write(f"\n[Success] Data Extracted.")
+        self.textbox_api_data.write(f"Response from API:\n")
+        self.textbox_api_data.write(json.dumps(self.scraped_data, indent=4))
 
         # Show images in 'view_frame'
         self.show_images()
@@ -370,6 +370,7 @@ class LogWindow(ctk.CTkToplevel):
         self.text_area.configure(state="normal")
         self.text_area.insert(ctk.END, text)
         self.text_area.configure(state="disabled")
+        
 
     def close_window(self):
         """ Destroy this widget """
@@ -444,7 +445,7 @@ class TextBoxFrame(ctk.CTkFrame):
                      corner_radius=4,
                      ).grid(row=0, column=0, columnspan=2, ipadx=5, ipady=5, padx=5, pady=2, sticky="ew")
 
-        self.text_area = ctk.CTkTextbox(self, font=font)
+        self.text_area = ctk.CTkTextbox(self, font=font, state="disabled")
         self.text_area.grid(row=1, column=0, columnspan=2,
                             sticky="news", padx=5, pady=2)
 
@@ -452,9 +453,11 @@ class TextBoxFrame(ctk.CTkFrame):
         self.columnconfigure(1, weight=1)
         self.rowconfigure(1, weight=1)
 
-    def write(self, index1, index2, data):
+    def write(self, data):
         """ 
         ### Write
-        Write `data` into the textbox at range of `index1` - `index2`
+        Write `data` into the textbox of this widget.
         """
-        ...
+        self.text_area.configure(state="normal")
+        self.text_area.insert(ctk.END, data)
+        self.text_area.configure(state="disabled")

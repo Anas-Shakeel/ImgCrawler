@@ -17,12 +17,12 @@ class Backend:
         self.img_api = ImgPile()
         pass
 
-    def get_response(self, url, logwindow):
+    def get_response(self, url, logwidget):
         """ 
         ### Get Response
         This method talks directly to the API and returns a response from it
         """
-        return self.img_api.get(url, logwindow)
+        return self.img_api.get(url, logwidget)
 
     def to_bytes(self, _size, _unit: str):
         """
