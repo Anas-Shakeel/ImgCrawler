@@ -308,6 +308,10 @@ class App(ctk.CTk):
         filename = "Demo"
 
         save_path = self.dir_field.get_dir()
+        if not save_path:
+            # User didn't enter directory
+            self.show_popup("Please Enter the directory path before downloading.")
+            return
 
         data_downloading_thread = Thread(target=self.backend.download_data,
                                          args=(self.scraped_data,
@@ -315,6 +319,8 @@ class App(ctk.CTk):
                                                filename,
                                                save_path))
         data_downloading_thread.start()
+        data_downloading_thread.join()
+        self.show_popup(f"API Data has been downloaded at {save_path}")
 
     def show_popup(self, message):
         """ 
@@ -412,7 +418,6 @@ class DirectoryField(ctk.CTkFrame):
         Returns the directory entered in the directory field
         """
         return self.entry_field.get()
-        # print(self.entry_field.get())
 
 
 class TextBoxFrame(ctk.CTkFrame):
