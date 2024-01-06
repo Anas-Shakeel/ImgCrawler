@@ -112,11 +112,11 @@ class App(ctk.CTk):
                                               )
         self.options_menu.grid(row=0, column=2, sticky="w")
 
-        self.button_download_json = ctk.CTkButton(self.other_frame,
+        self.button_download_data = ctk.CTkButton(self.other_frame,
                                                   text="Download Data",
                                                   width=90, height=35,
                                                   command=self.download_textual)
-        self.button_download_json.grid(row=0, column=3, sticky="w")
+        self.button_download_data.grid(row=0, column=3, sticky="w")
 
         self.other_frame.columnconfigure((0, ), weight=1)
 
@@ -193,7 +193,9 @@ class App(ctk.CTk):
             f"\n[Info] Total Extracted Images: {self.total_images}")
         self.textbox_log.write(
             f"\n[Info] Total Size of Images: {self.total_size}\n")
-        self.textbox_log.write(f"\n[Success] Data Extracted.")
+        self.textbox_log.write(f"\n[Success] Data Extracted.\n\n")
+        
+        self.textbox_api_data.delete_everything()
         self.textbox_api_data.write(f"Response from API:\n")
         self.textbox_api_data.write(json.dumps(self.scraped_data, indent=4))
 
@@ -299,10 +301,18 @@ class App(ctk.CTk):
         ### Download Textual
         Download the scraped data as a JSON/CSV file.
         """
+        # Scrape Validation
+        if not self.scraped_data:
+            # Haven't Scraped anything yet!
+            messagebox.showinfo("No Data to Download",
+                                "There is no data to download, Please scrape the data first!")
+            self.entry_url.focus()
+            return
+
         file_format = self.options_var.get()
         if not file_format:
-            # NOTHING IN THERE!
-            return
+            # No file_format specified
+            raise ValueError("Specify a file format first")
 
         # Filename for the files
         filename = "Demo"
@@ -310,17 +320,28 @@ class App(ctk.CTk):
         save_path = self.dir_field.get_dir()
         if not save_path:
             # User didn't enter directory
-            self.show_popup("Please Enter the directory path before downloading.")
+            messagebox.showinfo("No Save Location",
+                                "Please Enter the directory path before downloading.")
+            self.dir_field.focus()
             return
 
-        data_downloading_thread = Thread(target=self.backend.download_data,
-                                         args=(self.scraped_data,
-                                               file_format,
-                                               filename,
-                                               save_path))
-        data_downloading_thread.start()
-        data_downloading_thread.join()
-        self.show_popup(f"API Data has been downloaded at {save_path}")
+        try:
+            data_downloading_thread = Thread(target=self.backend.download_data,
+                                             args=(self.scraped_data,
+                                                   file_format,
+                                                   filename,
+                                                   save_path))
+            data_downloading_thread.start()
+            data_downloading_thread.join()
+            # Enable the button
+            self.button_download.configure(
+                text="Download Data", state=tk.NORMAL)
+            self.show_popup(f"API Data has been downloaded at {save_path}")
+
+        except Exception as error:
+            # ! REMOVE THIS AFTER DEBUGGING !
+            print(error)
+            self.handle_download_errors(error)
 
     def show_popup(self, message):
         """ 
@@ -451,6 +472,15 @@ class TextBoxFrame(ctk.CTkFrame):
         self.text_area.configure(state="normal")
         self.text_area.insert(ctk.END, data)
         self.text_area.configure(state="disabled")
+    
+    def delete_everything(self):
+        """ 
+        ### Clear
+        Clears the text in the textbox of this widget.
+        """
+        self.text_area.configure(state=tk.NORMAL)
+        self.text_area.delete("1.0", "end")
+        self.text_area.configure(state=tk.DISABLED)
 
 
 class PopupDialog(ctk.CTkToplevel):
