@@ -164,9 +164,6 @@ class App(ctk.CTk):
         # Disable button
         self.button_scrape.configure(text="Please wait...", state=tk.DISABLED)
 
-        # Create log window
-        # self.logwindow = LogWindow(master=self, title="Crawl Log")
-
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
             url, self.textbox_log))
@@ -347,34 +344,6 @@ class ImageBox(ctk.CTkFrame):
             self, text="", image=self.image, width=200, height=200)
         self.canvas.image = self.image
         self.canvas.grid(row=0, column=0, padx=5, pady=5)
-
-
-class LogWindow(ctk.CTkToplevel):
-    def __init__(self, master, title, *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
-
-        # Window Configuration
-        self.title(title)
-        self.geometry("500x350+25+25")
-        self.after(0, lambda: self.state("zoomed"))
-        self.grab_set()
-        self.after(0, lambda: self.focus_set())
-
-        self.text_area = ctk.CTkTextbox(self, font=("", 18))
-        self.text_area.grid(sticky="news", padx=10, pady=10)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-    def write(self, text):
-        """ Write `text` in the textarea """
-        self.text_area.configure(state="normal")
-        self.text_area.insert(ctk.END, text)
-        self.text_area.configure(state="disabled")
-        
-
-    def close_window(self):
-        """ Destroy this widget """
-        self.destroy()
 
 
 class DirectoryField(ctk.CTkFrame):
