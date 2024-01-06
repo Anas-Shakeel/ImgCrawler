@@ -26,9 +26,8 @@ class App(ctk.CTk):
 
         # * Root Configuration
         self.title(f"{self.PROGRAM_NAME} {self.PROGRAM_VER}")
-        # self.geometry("1024x768+10+10")
-        self.geometry("640x480+10+10")
-        self.minsize(520, 380)
+        self.place_in_center(1024, 768)
+        self.minsize(640, 480)
         self.after(0, lambda: self.state("zoomed"))
         self.option_add("*tearOff", tk.FALSE)
         self.protocol("WM_DELETE_WINDOW", self.exit_app)
@@ -50,7 +49,7 @@ class App(ctk.CTk):
         self.entry_url = ctk.CTkEntry(self.fields_frame,
                                       height=35, font=("", 18),
                                       text_color=("green", "#A6A6A6"),
-                                      placeholder_text="Enter URL Here...")
+                                      placeholder_text="Enter Album URL Here...")
         self.entry_url.grid(row=0, column=1, sticky="we")
         self.fields_frame.columnconfigure(1, weight=1)
 
@@ -142,26 +141,21 @@ class App(ctk.CTk):
         else:
             return False
 
-    def start_scraping(self, event=None):
+    def start_scraping(self, _=None):
         """
         ### Start Scraping
         Get the inputs and execute scraping
         """
         url = self.entry_url.get()
 
-        if not url:
-            messagebox.showerror("Invalid URL",
-                                 "Please enter a valid Album's URL from imgpile.com website.")
-            return
-
-        # URL Validation
-        if not self.validate_url(url):
+        if not url or not self.validate_url(url):
             messagebox.showerror("Invalid URL",
                                  "Please enter a valid Album's URL from imgpile.com website.")
             return
 
         # Disable button
-        self.button_scrape.configure(text="Please wait...", state=tk.DISABLED)
+        self.button_scrape.configure(
+            text="Please wait...", state=tk.DISABLED)
 
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
@@ -169,7 +163,7 @@ class App(ctk.CTk):
         scraping_thread.start()
 
     def scrape_in_background(self, url, logwidget):
-        """ 
+        """
         ### Scrape in Background
         scrape the data in background (new thread)
         """
@@ -194,7 +188,7 @@ class App(ctk.CTk):
         self.textbox_log.write(
             f"\n[Info] Total Size of Images: {self.total_size}\n")
         self.textbox_log.write(f"\n[Success] Data Extracted.\n\n")
-        
+
         self.textbox_api_data.delete_everything()
         self.textbox_api_data.write(f"Response from API:\n")
         self.textbox_api_data.write(json.dumps(self.scraped_data, indent=4))
@@ -207,10 +201,10 @@ class App(ctk.CTk):
             label_text=f"{self.total_images} images were scraped")
 
     def update_properties(self):
-        """ 
+        """
         ### Update Properties
         updates or adds some properties regarding the scraped data such as
-        `len(total_images)`, `size(total_images)`, `links(all_images)` etc
+        `self.total_images` and `self.total_size`
         """
         # * Get the number of total images
         self.total_images = len(self.scraped_data)
@@ -226,7 +220,7 @@ class App(ctk.CTk):
     def handle_errors(self, error):
         """
         ### Handles errors
-        handle errors which occur in scraping process 
+        handle errors which occur in scraping process
         """
         # Enable scrape button
         self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
@@ -236,12 +230,12 @@ class App(ctk.CTk):
             "Scraping Failed", f"An error occurred: {str(error)}")
 
     def handle_download_errors(self, error_message):
-        """ 
+        """
         ### Handle Download Errors
         handle errors which occur in downloading process
         """
         # Enable download button
-        self.button_download.configure(text="Download", state=tk.NORMAL)
+        self.button_download.configure(text="Download Images", state=tk.NORMAL)
 
         # Show Error Dialog
         messagebox.showerror(
@@ -264,21 +258,23 @@ class App(ctk.CTk):
 
     def download(self):
         """ Download the images """
-        # Disable the download button first!!!
-        self.button_download.configure(text="Please wait", state=tk.DISABLED)
-
         savepath = self.dir_field.get_dir()
         if not savepath:
-            self.after(0, self.handle_download_errors,
-                       "Please select a directory to save images.")
+            messagebox.showinfo("No Save Location Specified",
+                                "Please Enter the directory path before downloading.")
+            self.dir_field.entry_field.focus()
             return
+
+        # Disable the download button
+        self.button_download.configure(
+            text="Please wait", state=tk.DISABLED)
 
         self.downloading_thread = Thread(
             target=self.begin_dowmload, args=(savepath, ))
         self.downloading_thread.start()
 
     def begin_dowmload(self, save_path):
-        """ 
+        """
         ### Begin Download
         Start the downloading process in a new thread
         """
@@ -294,10 +290,11 @@ class App(ctk.CTk):
             self.after(0, self.handle_download_errors, e)
 
         finally:
-            self.button_download.configure(text="Download", state=tk.NORMAL)
+            self.button_download.configure(
+                text="Download", state=tk.NORMAL)
 
     def download_textual(self):
-        """ 
+        """
         ### Download Textual
         Download the scraped data as a JSON/CSV file.
         """
@@ -322,7 +319,7 @@ class App(ctk.CTk):
             # User didn't enter directory
             messagebox.showinfo("No Save Location",
                                 "Please Enter the directory path before downloading.")
-            self.dir_field.focus()
+            self.dir_field.entry_field.focus()
             return
 
         try:
@@ -349,6 +346,14 @@ class App(ctk.CTk):
         Shows a popup dialog displaying `message`
         """
         PopupDialog(self, message)
+
+    def place_in_center(self, width, height):
+        """ Places `self` in the center of the screen """
+        x = self.winfo_screenwidth() // 2 - width // 2
+        y = self.winfo_screenheight() // 2 - height // 2
+
+        geo_string = f"{width}x{height}+{x}+{y}"
+        self.geometry(geo_string)
 
     def get_screen_center(self):
         """
@@ -472,7 +477,7 @@ class TextBoxFrame(ctk.CTkFrame):
         self.text_area.configure(state="normal")
         self.text_area.insert(ctk.END, data)
         self.text_area.configure(state="disabled")
-    
+
     def delete_everything(self):
         """ 
         ### Clear
