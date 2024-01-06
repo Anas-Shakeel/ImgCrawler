@@ -298,6 +298,7 @@ class App(ctk.CTk):
         """ 
         ### Download Textual
         Download the scraped data as a JSON/CSV file.
+        """
         file_format = self.options_var.get()
         if not file_format:
             # NOTHING IN THERE!
@@ -314,8 +315,13 @@ class App(ctk.CTk):
                                                filename,
                                                save_path))
         data_downloading_thread.start()
+
+    def show_popup(self, message):
+        """ 
+        ### Show Popup
+        Shows a popup dialog displaying `message`
         """
-        PopupDialog(self, "Custom Dialog", "Press 'OK' to close the dialog.")
+        PopupDialog(self, message)
 
     def get_screen_center(self):
         """
@@ -443,11 +449,10 @@ class TextBoxFrame(ctk.CTkFrame):
 
 
 class PopupDialog(ctk.CTkToplevel):
-    def __init__(self, parent, title, message):
+    def __init__(self, parent, message):
         super().__init__(parent)
 
         self.overrideredirect(1)
-        self.title(title)
         self.place_in_center(300, 150)
 
         # Set up widgets
