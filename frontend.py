@@ -250,7 +250,7 @@ class App(ctk.CTk):
         """ Displays images in `view_frame` in background """
         for index, image in enumerate(self.scraped_data):
             ImageBox(self.view_frame,
-                     thumb_url=image['thumb_url'],).grid(row=0, column=index, padx=5, pady=5)
+                     thumb_url=image['thumb_url'],).grid(row=0, column=index, padx=5)
 
     def cancel_scraping(self):
         """ Cancel/Terminate the scraping thread """
@@ -385,11 +385,11 @@ class ImageBox(ctk.CTkFrame):
         raw_data = requests.get(self.thumb_url).content
         image = Image.open(BytesIO(raw_data))
 
-        self.image = ctk.CTkImage(image, size=(200, 200))
+        self.image = ctk.CTkImage(image, size=(180, 180))
 
     def create_widgets(self):
         self.canvas = ctk.CTkLabel(
-            self, text="", image=self.image, width=200, height=200)
+            self, text="", image=self.image, width=180, height=180)
         self.canvas.image = self.image
         self.canvas.grid(row=0, column=0, padx=5, pady=5)
 
