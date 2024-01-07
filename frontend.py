@@ -551,30 +551,46 @@ class DownloadDialog(ctk.CTkToplevel):
 
         # Fields
         ctk.CTkLabel(self._mainframe, text="Data Type", font=("", 15),
-                     ).grid(row=0, column=0, sticky="w")
+                     ).grid(row=0, column=0, sticky="w",padx=10, pady=10)
 
-        self._options_var = ctk.StringVar(value="JSON")
+        self._options_var = ctk.StringVar(value="IMAGE")
         self._options_menu = ctk.CTkOptionMenu(self._mainframe,
-                                               width=150, height=30,
+                                               width=120, height=30,
                                                variable=self._options_var,
                                                values=["JSON", "CSV", "IMAGE"],
                                                command=self.on_options_changed_datatype
                                                )
-        self._options_menu.grid(row=0, column=1, sticky="w")
+        self._options_menu.grid(row=0, column=1, sticky="w", padx=10, pady=10)
+
+        self._entry_filename = ctk.CTkEntry(self._mainframe,
+                                            placeholder_text="Filename",
+                                            width=120, height=30)
+        # self._entry_filename.grid(row=0, column=2, sticky="w", padx=10, pady=10)
+
+        self._options_quality = ctk.CTkOptionMenu(self._mainframe,
+                                                  width=120, height=30,
+                                                  values=[
+                                                      "High Quality", "Low Quality"],
+                                                  )
+        self._options_quality.grid(row=0, column=2, sticky="w", padx=10, pady=10)
 
         # ? Padding & Spacing
-        for child in self._mainframe.winfo_children():
-            child.grid_configure(padx=10, pady=10)
+        # for child in self._mainframe.winfo_children():
+            # child.grid_configure(padx=10, pady=10)
 
     def on_options_changed_datatype(self, value=None):
         """ Callback on options values change """
         if value in ["JSON", "CSV"]:
             # Textual data
             print("Textual", value)
+            self._options_quality.grid_forget()
+            self._entry_filename.grid(row=0, column=2, sticky="w", padx=10, pady=10)
             ...
         else:
             # Image data
             print("Image", value)
+            self._entry_filename.grid_forget()
+            self._options_quality.grid(row=0, column=2, sticky="w", padx=10, pady=10)
             ...
 
     def place_in_center(self, width, height):
