@@ -51,6 +51,7 @@ class App(ctk.CTk):
                                       text_color=("green", "#A6A6A6"),
                                       placeholder_text="Enter Album URL Here...")
         self.entry_url.grid(row=0, column=1, sticky="we")
+        # self.entry_url.focus()
         self.fields_frame.columnconfigure(1, weight=1)
 
         self.button_scrape = ctk.CTkButton(
@@ -298,6 +299,10 @@ class App(ctk.CTk):
         ### Download Textual
         Download the scraped data as a JSON/CSV file.
         """
+        # ! DEBUG MODE:: Remove afterwards ! #
+        DownloadDialog(self, )
+        return
+
         # Scrape Validation
         if not self.scraped_data:
             # Haven't Scraped anything yet!
@@ -520,3 +525,62 @@ class PopupDialog(ctk.CTkToplevel):
 
     def on_ok(self):
         self.destroy()
+
+
+class DownloadDialog(ctk.CTkToplevel):
+    """ 
+    ### Download Popup
+    Download Popup custom widget for various downloading options & fields
+    """
+
+    def __init__(self, master, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+
+        # Toplevel Configurations
+        self.title("Download")
+        self.place_in_center(500, 150)
+        self.resizable(False, False)
+        self.grab_set()
+        # self.wait_window(self)
+
+        # Mainframe
+        self._mainframe = ctk.CTkFrame(self, )
+        self._mainframe.grid(padx=5, pady=5, sticky="news")
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+        # Fields
+        ctk.CTkLabel(self._mainframe, text="Data Type", font=("", 15),
+                     ).grid(row=0, column=0, sticky="w")
+
+        self._options_var = ctk.StringVar(value="JSON")
+        self._options_menu = ctk.CTkOptionMenu(self._mainframe,
+                                               width=150, height=30,
+                                               variable=self._options_var,
+                                               values=["JSON", "CSV", "IMAGE"],
+                                               command=self.on_options_changed_datatype
+                                               )
+        self._options_menu.grid(row=0, column=1, sticky="w")
+
+        # ? Padding & Spacing
+        for child in self._mainframe.winfo_children():
+            child.grid_configure(padx=10, pady=10)
+
+    def on_options_changed_datatype(self, value=None):
+        """ Callback on options values change """
+        if value in ["JSON", "CSV"]:
+            # Textual data
+            print("Textual", value)
+            ...
+        else:
+            # Image data
+            print("Image", value)
+            ...
+
+    def place_in_center(self, width, height):
+        """ Places `self` in the center of the screen """
+        x = self.winfo_screenwidth() // 2 - width // 2
+        y = self.winfo_screenheight() // 2 - height // 2
+
+        geo_string = f"{width}x{height}+{x}+{y}"
+        self.geometry(geo_string)
