@@ -538,21 +538,22 @@ class DownloadDialog(ctk.CTkToplevel):
 
         # Toplevel Configurations
         self.title("Download")
-        self.place_in_center(500, 150)
+        self.place_in_center(520, 120)
         self.resizable(False, False)
         self.grab_set()
         # self.wait_window(self)
 
-        # Mainframe
+        # * Mainframe
         self._mainframe = ctk.CTkFrame(self, )
         self._mainframe.grid(padx=5, pady=5, sticky="news")
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
-        # Fields
-        ctk.CTkLabel(self._mainframe, text="Data Type", font=("", 15),
-                     ).grid(row=0, column=0, sticky="w",padx=10, pady=10)
+        # * DATATYPE Label
+        ctk.CTkLabel(self._mainframe, text="Data Format", font=("", 15),
+                     ).grid(row=0, column=0, sticky="w", padx=10, pady=10)
 
+        # * DATATYPES Options Dropdown
         self._options_var = ctk.StringVar(value="IMAGE")
         self._options_menu = ctk.CTkOptionMenu(self._mainframe,
                                                width=120, height=30,
@@ -562,21 +563,45 @@ class DownloadDialog(ctk.CTkToplevel):
                                                )
         self._options_menu.grid(row=0, column=1, sticky="w", padx=10, pady=10)
 
+        # * Filename Entry
         self._entry_filename = ctk.CTkEntry(self._mainframe,
-                                            placeholder_text="Filename",
+                                            placeholder_text="Filename", font=("", 16),
                                             width=120, height=30)
         # self._entry_filename.grid(row=0, column=2, sticky="w", padx=10, pady=10)
 
+        # * Quality Options Dropdown
         self._options_quality = ctk.CTkOptionMenu(self._mainframe,
                                                   width=120, height=30,
                                                   values=[
                                                       "High Quality", "Low Quality"],
                                                   )
-        self._options_quality.grid(row=0, column=2, sticky="w", padx=10, pady=10)
+        self._options_quality.grid(
+            row=0, column=2, sticky="w", padx=10, pady=10)
+
+        # * Download button
+        self._button_download = ctk.CTkButton(self._mainframe,
+                                              width=120, height=30,
+                                              text="Download",)
+        self._button_download.grid(
+            row=0, column=3, sticky="e", padx=10, pady=10)
+
+        self._dir_field = DirectoryField(self._mainframe)
+        self._dir_field.grid(row=1, column=0, columnspan=3, sticky="ew", padx=10, pady=10)
+        
+        # * Cancel button
+        self._button_cancel = ctk.CTkButton(self._mainframe,
+                                              width=120, height=30,
+                                              text="Cancel",)
+        self._button_cancel.grid(
+            row=1, column=3, sticky="e", padx=10, pady=10)
+        
+
+        # * Download button spacing
+        self._mainframe.columnconfigure(3, weight=1)
 
         # ? Padding & Spacing
         # for child in self._mainframe.winfo_children():
-            # child.grid_configure(padx=10, pady=10)
+        # child.grid_configure(padx=10, pady=10)
 
     def on_options_changed_datatype(self, value=None):
         """ Callback on options values change """
@@ -584,14 +609,15 @@ class DownloadDialog(ctk.CTkToplevel):
             # Textual data
             print("Textual", value)
             self._options_quality.grid_forget()
-            self._entry_filename.grid(row=0, column=2, sticky="w", padx=10, pady=10)
-            ...
+            self._entry_filename.grid(
+                row=0, column=2, sticky="w", padx=10, pady=10)
+
         else:
             # Image data
             print("Image", value)
             self._entry_filename.grid_forget()
-            self._options_quality.grid(row=0, column=2, sticky="w", padx=10, pady=10)
-            ...
+            self._options_quality.grid(
+                row=0, column=2, sticky="w", padx=10, pady=10)
 
     def place_in_center(self, width, height):
         """ Places `self` in the center of the screen """
