@@ -53,7 +53,7 @@ class App(ctk.CTk):
                                       text_color=("green", "#A6A6A6"),
                                       placeholder_text="Enter Album URL Here...")
         self.entry_url.grid(row=0, column=1, sticky="we")
-        # self.entry_url.focus()
+
         self.fields_frame.columnconfigure(1, weight=1)
 
         self.button_scrape = ctk.CTkButton(
@@ -97,28 +97,11 @@ class App(ctk.CTk):
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
         self.other_frame.grid(row=3, sticky="we")
 
-        self.dir_field = DirectoryField(self.other_frame)
-        self.dir_field.grid(row=0, column=0, sticky="ew")
-
-        self.button_download = ctk.CTkButton(self.other_frame,
-                                             text="Download Images",
-                                             width=90, height=35,
-                                             command=self.download)
-        self.button_download.grid(row=0, column=1, sticky="w")
-
-        self.options_var = ctk.StringVar(value="JSON")
-        self.options_menu = ctk.CTkOptionMenu(self.other_frame,
-                                              width=100, height=35,
-                                              variable=self.options_var,
-                                              values=["JSON", "CSV"],
-                                              )
-        self.options_menu.grid(row=0, column=2, sticky="w")
-
         self.button_download_data = ctk.CTkButton(self.other_frame,
-                                                  text="Download Data",
+                                                  text="Download",
                                                   width=90, height=35,
-                                                  command=self.download_textual)
-        self.button_download_data.grid(row=0, column=3, sticky="w")
+                                                  command=self.download)
+        self.button_download_data.grid(row=0, column=0, sticky="e")
 
         self.other_frame.columnconfigure((0, ), weight=1)
 
@@ -261,50 +244,6 @@ class App(ctk.CTk):
 
     def download(self):
         """ Download the images """
-        savepath = self.dir_field.get_dir()
-        if not savepath:
-            messagebox.showinfo("No Save Location Specified",
-                                "Please Enter the directory path before downloading.")
-            self.dir_field.entry_field.focus()
-            return
-
-        # Disable the download button
-        self.button_download.configure(
-            text="Please wait", state=tk.DISABLED)
-
-        self.downloading_thread = Thread(
-            target=self.begin_dowmload, args=(savepath, ))
-        self.downloading_thread.start()
-
-    def begin_dowmload(self, save_path):
-        """
-        ### Begin Download
-        Start the downloading process in a new thread
-        """
-        try:
-            if not self.scraped_data:
-                raise ValueError("Please Scraped the images first.")
-
-            for image in self.scraped_data:
-                filename = image['title'] + image['extension']
-                self.backend.download_images(image['image_url'],
-                                             filename, save_path)
-        except Exception as e:
-            self.after(0, self.handle_download_errors, e)
-
-        finally:
-            self.button_download.configure(
-                text="Download", state=tk.NORMAL)
-
-    def download_textual(self):
-        """
-        ### Download Textual
-        Download the scraped data as a JSON/CSV file.
-        """
-        # ! DEBUG MODE:: Remove afterwards ! #
-        DownloadDialog(self, )
-        return
-
         # Scrape Validation
         if not self.scraped_data:
             # Haven't Scraped anything yet!
@@ -313,38 +252,50 @@ class App(ctk.CTk):
             self.entry_url.focus()
             return
 
-        file_format = self.options_var.get()
-        if not file_format:
-            # No file_format specified
-            raise ValueError("Specify a file format first")
+        # * Show Download Dialog
+        self.download_dialog = DownloadDialog(self,
+                                              self.image_downloader,
+                                              self.text_downloader)
 
-        # Filename for the files
-        filename = "Demo"
+    def image_downloader(self, save_path, image_quality):
+        """ 
+        ### Image Downloader
+        Begin image downloading process/thread.
+        """
+        if not self.scraped_data:
+            raise ValueError("Please Scraped the images first.")
 
-        save_path = self.dir_field.get_dir()
-        if not save_path:
-            # User didn't enter directory
-            messagebox.showinfo("No Save Location",
-                                "Please Enter the directory path before downloading.")
-            self.dir_field.entry_field.focus()
-            return
+        self.image_download_thread = Thread(
+            target=self.begin_image_download, args=(save_path, image_quality))
+        self.image_download_thread.start()
 
+    def begin_image_download(self, save_path, image_quality):
+        """
+        ### Begin Download
+        Start the downloading process in a new thread
+        """
+        try:
+            for image in self.scraped_data:
+                filename = image['title'] + image['extension']
+                self.backend.download_images(image['image_url'],
+                                             filename, save_path)
+        except Exception as e:
+            self.after(0, self.handle_download_errors, e)
+
+    def text_downloader(self, format_, filename_, directory_):
+        """
+        ### Text Downloader
+        Download the scraped data as a JSON/CSV file.
+        """
         try:
             data_downloading_thread = Thread(target=self.backend.download_data,
                                              args=(self.scraped_data,
-                                                   file_format,
-                                                   filename,
-                                                   save_path))
+                                                   format_,
+                                                   filename_,
+                                                   directory_))
             data_downloading_thread.start()
-            data_downloading_thread.join()
-            # Enable the button
-            self.button_download.configure(
-                text="Download Data", state=tk.NORMAL)
-            self.show_popup(f"API Data has been downloaded at {save_path}")
 
         except Exception as error:
-            # ! REMOVE THIS AFTER DEBUGGING !
-            print(error)
             self.handle_download_errors(error)
 
     def show_popup(self, message):
@@ -535,8 +486,11 @@ class DownloadDialog(ctk.CTkToplevel):
     Download Popup custom widget for various downloading options & fields
     """
 
-    def __init__(self, master, *args, **kwargs):
+    def __init__(self, master, image_downlod_callback, text_download_callback, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
+
+        self.image_downloader = image_downlod_callback
+        self.text_downloader = text_download_callback
 
         # Toplevel Configurations
         self.title("Download")
@@ -568,7 +522,6 @@ class DownloadDialog(ctk.CTkToplevel):
         self._entry_filename = ctk.CTkEntry(self._mainframe,
                                             placeholder_text="Filename", font=("", 16),
                                             width=120, height=30)
-        # self._entry_filename.grid(row=0, column=2, sticky="w", padx=10, pady=10)
 
         # * Quality Options Dropdown
         self._options_quality = ctk.CTkOptionMenu(self._mainframe,
@@ -583,7 +536,7 @@ class DownloadDialog(ctk.CTkToplevel):
         self._button_download = ctk.CTkButton(self._mainframe,
                                               width=120, height=30,
                                               text="Download",
-                                              command=self.download_callback)
+                                              command=self.start_download)
         self._button_download.grid(
             row=0, column=3, sticky="e", padx=10, pady=10)
 
@@ -608,14 +561,12 @@ class DownloadDialog(ctk.CTkToplevel):
         """ Callback on options values change """
         if value in ["JSON", "CSV"]:
             # Textual data
-            print("Textual", value)
             self._options_quality.grid_forget()
             self._entry_filename.grid(
                 row=0, column=2, sticky="w", padx=10, pady=10)
 
         else:
             # Image data
-            print("Image", value)
             self._entry_filename.grid_forget()
             self._options_quality.grid(
                 row=0, column=2, sticky="w", padx=10, pady=10)
@@ -644,33 +595,35 @@ class DownloadDialog(ctk.CTkToplevel):
         # Place the bar
         self._progress_bar.grid_forget()
 
-    def download_callback(self):
+    def start_download(self):
         """ 
-        ### Download Callback
+        ### Start Download
+        Gets user data and Starts the downloaders
         """
-        # Show the progress bar
-        self.show_progress_bar()
+        # Prepare to download > get user values
+        # * Data Format
+        format_ = self._options_menu.get()
 
-        try:
-            pn = Thread(target=self.process, args=(10,))
-            pn.start()
-        except Exception as e:
-            messagebox.showerror("error", str(e))
+        quality_, filename_ = None, None
+        if format_ == "IMAGE":
+            # Get Quality
+            quality_ = self._options_quality.get()
+        else:
+            # Get Filename
+            filename_ = self._entry_filename.get()
 
-    def process(self, tasks_, speed_=1, ):
-        tasks = tasks_
-        download = 0
-        speed = speed_
-        while download < tasks:
-            # CODE TO EXECUTE :: DOWNLOADING...
-            sleep(0.25)
+        # * Get Save Path
+        directory_ = self._dir_field.get_dir()
+        if not directory_:
+            # None value, Raise error!
             ...
-            self._progress_bar['value'] += (speed/tasks)*100
-            download += speed
-            self.update_idletasks()
-        
-        # Hide the progress bar
-        self.hide_progress_bar()
+            return
 
-        # Destroy `self` after download.
-        self.destroy()
+        # Call Download_callback with values
+        if format_ == "IMAGE":
+            # Call Image downloader
+            self.image_downloader(directory_, quality_)
+
+        else:
+            # Call Text downloader
+            self.text_downloader(format_, filename_, directory_)
