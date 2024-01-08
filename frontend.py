@@ -543,7 +543,6 @@ class DownloadDialog(ctk.CTkToplevel):
         self.place_in_center(520, 140)
         self.resizable(False, False)
         self.grab_set()
-        # self.wait_window(self)
 
         # * Mainframe
         self._mainframe = ctk.CTkFrame(self, )
