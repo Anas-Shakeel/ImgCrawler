@@ -540,7 +540,7 @@ class DownloadDialog(ctk.CTkToplevel):
 
         # Toplevel Configurations
         self.title("Download")
-        self.place_in_center(520, 140)
+        self.place_in_center(520, 120)
         self.resizable(False, False)
         self.grab_set()
         # self.wait_window(self)
@@ -602,25 +602,8 @@ class DownloadDialog(ctk.CTkToplevel):
         # * Download button spacing
         self._mainframe.columnconfigure(3, weight=1)
 
-        """
         # * Progress Bar
-        self._progress_var = ctk.DoubleVar(value=10)
-        self._progress_bar = ctk.CTkProgressBar(self, determinate_speed=1,
-                                                mode="determinate",
-                                                height=15,
-                                                corner_radius=2,
-                                                orientation="horizontal",
-                                                variable=self._progress_var)
-        self._progress_bar.set(0)
-        self._progress_bar.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
-        # """
-
         self._progress_bar = ttk.Progressbar(self,)
-        self._progress_bar.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
-
-        # ? Padding & Spacing
-        # for child in self._mainframe.winfo_children():
-        # child.grid_configure(padx=10, pady=10)
 
     def on_options_changed_datatype(self, value=None):
         """ Callback on options values change """
@@ -645,6 +628,28 @@ class DownloadDialog(ctk.CTkToplevel):
 
         geo_string = f"{width}x{height}+{x}+{y}"
         self.geometry(geo_string)
+
+    def show_progress_bar(self):
+        """ 
+        ### Show Progress bar
+        shows the progress bar dynamically and auto-sets the geometry accrodingly
+        """
+        # Set the geometry to fit the bar
+        self.place_in_center(520, 140)
+
+        # Place the bar
+        self._progress_bar.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+
+    def hide_progress_bar(self):
+        """ 
+        ### Hide Progress bar
+        hides the progress bar and resets the geometry to default size
+        """
+        # Set the geometry
+        self._progress_bar.place_in_center(520, 120)
+
+        # Place the bar
+        self._progress_bar.grid_forget()
 
     def download_callback(self):
         """ 
