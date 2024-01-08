@@ -540,7 +540,7 @@ class DownloadDialog(ctk.CTkToplevel):
 
         # Toplevel Configurations
         self.title("Download")
-        self.place_in_center(520, 120)
+        self.place_in_center(520, 140)
         self.resizable(False, False)
         self.grab_set()
         # self.wait_window(self)
@@ -632,22 +632,16 @@ class DownloadDialog(ctk.CTkToplevel):
     def show_progress_bar(self):
         """ 
         ### Show Progress bar
-        shows the progress bar dynamically and auto-sets the geometry accrodingly
+        shows the progress bar
         """
-        # Set the geometry to fit the bar
-        self.place_in_center(520, 140)
-
         # Place the bar
         self._progress_bar.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
 
     def hide_progress_bar(self):
         """ 
         ### Hide Progress bar
-        hides the progress bar and resets the geometry to default size
+        hides the progress bar
         """
-        # Set the geometry
-        self._progress_bar.place_in_center(520, 120)
-
         # Place the bar
         self._progress_bar.grid_forget()
 
@@ -655,19 +649,29 @@ class DownloadDialog(ctk.CTkToplevel):
         """ 
         ### Download Callback
         """
-        tasks = 100
+        # Show the progress bar
+        self.show_progress_bar()
+
+        try:
+            pn = Thread(target=self.process, args=(10,))
+            pn.start()
+        except Exception as e:
+            messagebox.showerror("error", str(e))
+
+    def process(self, tasks_, speed_=1, ):
+        tasks = tasks_
         download = 0
-        speed = 1
+        speed = speed_
         while download < tasks:
             # CODE TO EXECUTE :: DOWNLOADING...
-            # sleep(0.25)
+            sleep(0.25)
             ...
             self._progress_bar['value'] += (speed/tasks)*100
             download += speed
             self.update_idletasks()
-
-        # TODO > Show Download Complete Dialog/Message !
-        ...
+        
+        # Hide the progress bar
+        self.hide_progress_bar()
 
         # Destroy `self` after download.
         self.destroy()
