@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import customtkinter as ctk
 from customtkinter import filedialog
 from tkinter import messagebox
@@ -9,6 +10,7 @@ from threading import Thread
 import requests
 from io import BytesIO
 from PIL import Image
+from time import sleep
 
 
 class App(ctk.CTk):
@@ -538,14 +540,14 @@ class DownloadDialog(ctk.CTkToplevel):
 
         # Toplevel Configurations
         self.title("Download")
-        self.place_in_center(520, 120)
+        self.place_in_center(520, 140)
         self.resizable(False, False)
         self.grab_set()
         # self.wait_window(self)
 
         # * Mainframe
         self._mainframe = ctk.CTkFrame(self, )
-        self._mainframe.grid(padx=5, pady=5, sticky="news")
+        self._mainframe.grid(row=0, column=0, padx=5, pady=5, sticky="news")
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
@@ -581,23 +583,40 @@ class DownloadDialog(ctk.CTkToplevel):
         # * Download button
         self._button_download = ctk.CTkButton(self._mainframe,
                                               width=120, height=30,
-                                              text="Download",)
+                                              text="Download",
+                                              command=self.download_callback)
         self._button_download.grid(
             row=0, column=3, sticky="e", padx=10, pady=10)
 
         self._dir_field = DirectoryField(self._mainframe)
-        self._dir_field.grid(row=1, column=0, columnspan=3, sticky="ew", padx=10, pady=10)
-        
+        self._dir_field.grid(row=1, column=0, columnspan=3,
+                             sticky="ew", padx=10, pady=10)
+
         # * Cancel button
         self._button_cancel = ctk.CTkButton(self._mainframe,
-                                              width=120, height=30,
-                                              text="Cancel",)
+                                            width=120, height=30,
+                                            text="Cancel",)
         self._button_cancel.grid(
             row=1, column=3, sticky="e", padx=10, pady=10)
-        
 
         # * Download button spacing
         self._mainframe.columnconfigure(3, weight=1)
+
+        """
+        # * Progress Bar
+        self._progress_var = ctk.DoubleVar(value=10)
+        self._progress_bar = ctk.CTkProgressBar(self, determinate_speed=1,
+                                                mode="determinate",
+                                                height=15,
+                                                corner_radius=2,
+                                                orientation="horizontal",
+                                                variable=self._progress_var)
+        self._progress_bar.set(0)
+        self._progress_bar.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+        # """
+
+        self._progress_bar = ttk.Progressbar(self,)
+        self._progress_bar.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
 
         # ? Padding & Spacing
         # for child in self._mainframe.winfo_children():
@@ -626,3 +645,24 @@ class DownloadDialog(ctk.CTkToplevel):
 
         geo_string = f"{width}x{height}+{x}+{y}"
         self.geometry(geo_string)
+
+    def download_callback(self):
+        """ 
+        ### Download Callback
+        """
+        tasks = 100
+        download = 0
+        speed = 1
+        while download < tasks:
+            # CODE TO EXECUTE :: DOWNLOADING...
+            # sleep(0.25)
+            ...
+            self._progress_bar['value'] += (speed/tasks)*100
+            download += speed
+            self.update_idletasks()
+
+        # TODO > Show Download Complete Dialog/Message !
+        ...
+
+        # Destroy `self` after download.
+        self.destroy()
