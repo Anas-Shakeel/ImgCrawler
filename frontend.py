@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 import customtkinter as ctk
-from customtkinter import filedialog
 from tkinter import messagebox
+from customtkinter import filedialog
 from backend import Backend
 import json
 from os.path import normpath
@@ -158,7 +158,7 @@ class App(ctk.CTk):
             self.after(0, self.update_gui, result)
         except Exception as e:
             # In-case of errors, call error handler
-            self.after(0, self.handle_errors, e)
+            self.after(0, self.handle_scrape_errors, e)
 
     def update_gui(self, result=None):
         """ Updates the GUI """
@@ -203,7 +203,7 @@ class App(ctk.CTk):
                 float(size_unit[0]), size_unit[1])
         self.total_size = self.backend.to_human_readable_storage(total_bytes)
 
-    def handle_errors(self, error):
+    def handle_scrape_errors(self, error):
         """
         ### Handles errors
         handle errors which occur in scraping process
@@ -469,7 +469,7 @@ class PopupDialog(ctk.CTkToplevel):
         parent.wait_window(self)
 
     def place_in_center(self, width, height):
-        """ Places `self` in the center of the screen """
+        ''' Places `self` in the center of the screen '''
         x = self.winfo_screenwidth() // 2 - width // 2
         y = self.winfo_screenheight() // 2 - height // 2
 
@@ -600,7 +600,7 @@ class DownloadDialog(ctk.CTkToplevel):
         ### Start Download
         Gets user data and Starts the downloaders
         """
-        # Prepare to download > get user values
+        # ? Prepare to download > get user values
         # * Data Format
         format_ = self._options_menu.get()
 
@@ -627,3 +627,16 @@ class DownloadDialog(ctk.CTkToplevel):
         else:
             # Call Text downloader
             self.text_downloader(format_, filename_, directory_)
+
+    def on_progress(self, ):
+        """ 
+        Call this function everytime something is downloaded
+        """
+        ...
+
+    def cancel(self):
+        """ 
+        ### Cancel
+        Close the dialog aka DESTROY!
+        """
+        self.destroy()
