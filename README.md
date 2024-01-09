@@ -7,10 +7,11 @@
 1. Install [Python 3.x](https://www.python.org/download)
 2. __Download__ or __clone__ this repository on your local machine.
 3. Extract the `zip` file.
-4. Run `main.py` either from terminal or just by double-clicking it.
+4. Open terminal in this folder and run `pip install -r requirements.txt`
+5. Run `main.py` either from terminal or just by double-clicking it.
 
 ## **imgpile API**
-> `imgpile` is a custom _API_ i wrote in python that extracts data of every image in an album from [impile.com](https://imgpile.com) website and sends a `json` response back. It's not an actual proper "API", it just acts like one! </br>
+> [**imgpile**](https://github.com/Anas-Shakeel/imgpile-custom-api) is a custom _API_ i wrote in python that extracts data of every image in an album from [impile.com](https://imgpile.com) website and sends a `json` response back. It's not an actual proper "API", it just acts like one! </br>
 
 __Response:__ Below is the response that this API returns:
 ``` json
