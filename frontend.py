@@ -3,6 +3,7 @@ from tkinter import ttk
 import customtkinter as ctk
 from tkinter import messagebox
 from customtkinter import filedialog
+from CTkToolTip import CTkToolTip
 from backend import Backend
 import json
 from os.path import normpath
@@ -53,16 +54,28 @@ class App(ctk.CTk):
                                       text_color=("green", "#A6A6A6"),
                                       placeholder_text="Enter Album URL Here...")
         self.entry_url.grid(row=0, column=1, sticky="we")
+        # Tooltip for entry url
+        CTkToolTip(self.entry_url, 
+                   follow=False, delay=0.5,
+                           message="Enter the URL of the album you want to scrape",)
 
         self.fields_frame.columnconfigure(1, weight=1)
 
         self.button_scrape = ctk.CTkButton(
             self.fields_frame, text="Scrape", width=90, height=35, command=self.start_scraping)
         self.button_scrape.grid(row=0, column=2)
+        # Tooltip for button
+        CTkToolTip(self.button_scrape, 
+                   follow=False, delay=0.5,
+                           message="Scrape the url",)
 
         self.button_scrape_cancel = ctk.CTkButton(
             self.fields_frame, text="Cancel", width=90, height=35, command=self.cancel_scraping)
         self.button_scrape_cancel.grid(row=0, column=3)
+        # Tooltip for button
+        CTkToolTip(self.button_scrape_cancel, 
+                   follow=False, delay=0.5,
+                           message="Cancel the scrape (doesn't work yet)",)
 
         # ? Padding childs
         for child in self.fields_frame.winfo_children():
@@ -102,6 +115,10 @@ class App(ctk.CTk):
                                                   width=90, height=35,
                                                   command=self.download)
         self.button_download_data.grid(row=0, column=0, sticky="e")
+        # Tooltip for button
+        CTkToolTip(self.button_download_data, 
+                   follow=False, delay=0.5,
+                           message="Download the scraped data",)
 
         self.other_frame.columnconfigure((0, ), weight=1)
 
@@ -367,13 +384,22 @@ class DirectoryField(ctk.CTkFrame):
                                         placeholder_text="Enter save location",
                                         font=("", 16))
         self.entry_field.grid(row=0, column=0, sticky="ew")
-
+        # Tooltip for Directory Field
+        CTkToolTip(self.entry_field, 
+                   follow=False, delay=0.5,
+                           message="Enter a directory/location where you want to save the data",)
+            
         # Open File Dialog Button
         self.image = ctk.CTkImage(
             dark_image=Image.open("assets\\directory_light_16px.png"))
         self.dir_button = ctk.CTkButton(
             self, text="", image=self.image, width=30, height=30, command=self.open_dialog)
         self.dir_button.grid(row=0, column=1, sticky="e")
+        # Tooltip for Dir Button
+        CTkToolTip(self.dir_button, 
+                   follow=False, delay=0.5,
+                           message="Open directory dialog",)
+        
 
         self.grid_columnconfigure(0, weight=1)
 
@@ -517,11 +543,19 @@ class DownloadDialog(ctk.CTkToplevel):
                                                command=self.on_options_changed_datatype
                                                )
         self._options_menu.grid(row=0, column=1, sticky="w", padx=10, pady=10)
+        # Tooltip for Options Menu
+        CTkToolTip(self._options_menu, 
+                   follow=False, delay=0.5,
+                           message="Select the format of data you want to download",)
 
         # * Filename Entry
         self._entry_filename = ctk.CTkEntry(self._mainframe,
                                             placeholder_text="Filename", font=("", 16),
                                             width=120, height=30)
+        # Tooltip for Entry filename
+        CTkToolTip(self._entry_filename, 
+                   follow=False, delay=0.5,
+                           message="Type in the name for the selected file (without extension)",)
 
         # * Quality Options Dropdown
         self._options_quality = ctk.CTkOptionMenu(self._mainframe,
@@ -531,6 +565,10 @@ class DownloadDialog(ctk.CTkToplevel):
                                                   )
         self._options_quality.grid(
             row=0, column=2, sticky="w", padx=10, pady=10)
+        # Tooltip for Quality Options
+        CTkToolTip(self._options_quality, 
+                   follow=False, delay=0.5,
+                           message="Choose the quality of image",)
 
         # * Download button
         self._button_download = ctk.CTkButton(self._mainframe,
@@ -539,6 +577,10 @@ class DownloadDialog(ctk.CTkToplevel):
                                               command=self.start_download)
         self._button_download.grid(
             row=0, column=3, sticky="e", padx=10, pady=10)
+        # Tooltip for Download button
+        CTkToolTip(self._button_download, 
+                   follow=False, delay=0.5,
+                           message="Start download",)
 
         self._dir_field = DirectoryField(self._mainframe)
         self._dir_field.grid(row=1, column=0, columnspan=3,
@@ -550,6 +592,10 @@ class DownloadDialog(ctk.CTkToplevel):
                                             text="Cancel",)
         self._button_cancel.grid(
             row=1, column=3, sticky="e", padx=10, pady=10)
+        # Tooltip for Cancel button
+        CTkToolTip(self._button_cancel, 
+                   follow=False, delay=0.5,
+                           message="Cancel download",)
 
         # * Download button spacing
         self._mainframe.columnconfigure(3, weight=1)
