@@ -589,7 +589,8 @@ class DownloadDialog(ctk.CTkToplevel):
         # * Cancel button
         self._button_cancel = ctk.CTkButton(self._mainframe,
                                             width=120, height=30,
-                                            text="Cancel",)
+                                            text="Cancel",
+                                            command=self.cancel)
         self._button_cancel.grid(
             row=1, column=3, sticky="e", padx=10, pady=10)
         # Tooltip for Cancel button
