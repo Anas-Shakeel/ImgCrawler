@@ -10,6 +10,14 @@
 4. Open terminal in this folder and run `pip install -r requirements.txt`
 5. Run `main.py` either from terminal or just by double-clicking it.
 
+
+## **Libraries used in this project**
+> ### **Third-party**
+> `CustomTkinter` `CTkTooltip` `Pandas` `BeautifulSoup` `Requests` `Pillow` `SoupSieve`
+> ### **Built-in**
+> `Json` `Tkinter` `Threading` `IO` `Time` `OS`
+
+
 ## **imgpile API**
 > [**imgpile**](https://github.com/Anas-Shakeel/imgpile-custom-api) is a custom _API_ i wrote in python that extracts data of every image in an album from [impile.com](https://imgpile.com) website and sends a `json` response back. It's not an actual proper "API", it just acts like one! </br>
 
