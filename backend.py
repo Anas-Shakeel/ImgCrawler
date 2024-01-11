@@ -17,6 +17,21 @@ class Backend:
         self.img_api = ImgPile()
         pass
 
+
+    def get_dummy_response(self):
+        """ 
+        ### Get Dummy Response
+        Returns the Dummy data without actually scraping the site to
+        save time debugging the application.
+        """
+        # Read the json file
+        with open("dummy.json") as dummy_file:
+            py_j = json.loads(dummy_file.read())
+        
+        print(py_j)
+        # Return the data
+        ...
+
     def get_response(self, url, logwidget):
         """ 
         ### Get Response
