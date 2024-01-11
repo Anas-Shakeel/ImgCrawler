@@ -274,28 +274,35 @@ class App(ctk.CTk):
                                               self.image_downloader,
                                               self.text_downloader)
 
-    def image_downloader(self, save_path, image_quality):
+    def image_downloader(self, save_path, image_quality,  step_callback):
         """ 
         ### Image Downloader
         Begin image downloading process/thread.
+
+        ```
+        step_callback = called everytime an image is downloaded
+        ```
         """
         if not self.scraped_data:
             raise ValueError("Please Scraped the images first.")
 
         self.image_download_thread = Thread(
-            target=self.begin_image_download, args=(save_path, image_quality))
+            target=self.begin_image_download, args=(save_path, image_quality, step_callback))
         self.image_download_thread.start()
 
-    def begin_image_download(self, save_path, image_quality):
+    def begin_image_download(self, save_path, image_quality, step_callback):
         """
         ### Begin Download
         Start the downloading process in a new thread
         """
         try:
-            for image in self.scraped_data:
+            for index, image in enumerate(self.scraped_data):
                 filename = image['title'] + image['extension']
                 self.backend.download_images(image['image_url'],
                                              filename, save_path)
+                # Call the `step_callback` with an argument
+                step_callback(index)
+                
         except Exception as e:
             self.after(0, self.handle_download_errors, e)
 
@@ -595,7 +602,7 @@ class DownloadDialog(ctk.CTkToplevel):
             row=1, column=3, sticky="e", padx=10, pady=10)
         # Tooltip for Cancel button
         CTkToolTip(self._button_cancel, 
-                   follow=False, delay=0.5,
+                   follow=False, delay=0.1,
                            message="Cancel download",)
 
         # * Download button spacing
@@ -669,16 +676,20 @@ class DownloadDialog(ctk.CTkToplevel):
         # Call Download_callback with values
         if format_ == "IMAGE":
             # Call Image downloader
-            self.image_downloader(directory_, quality_)
+            self.image_downloader(directory_, quality_, self.on_progress)
 
         else:
             # Call Text downloader
             self.text_downloader(format_, filename_, directory_)
 
-    def on_progress(self, ):
+    def on_progress(self, arg):
         """ 
+        ### On Progress
         Call this function everytime something is downloaded
         """
+        print("Progress Incremented! {}".format(arg))
+        # Every time this function is called:
+        # Increase the Progress
         ...
 
     def cancel(self):
