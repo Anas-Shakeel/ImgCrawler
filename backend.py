@@ -26,9 +26,7 @@ class Backend:
         """
         # Read the json file
         with open("dummy.json") as dummy_file:
-            py_j = json.loads(dummy_file.read())
-        
-        print(py_j)
+            return json.loads(dummy_file.read())
         # Return the data
         ...
 
