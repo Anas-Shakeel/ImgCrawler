@@ -62,7 +62,7 @@ class App(ctk.CTk):
         self.fields_frame.columnconfigure(1, weight=1)
 
         self.button_scrape = ctk.CTkButton(
-            self.fields_frame, text="Scrape", width=90, height=35, command=self.scrape_dummy)
+            self.fields_frame, text="Scrape", width=90, height=35, command=self.start_scraping)
         self.button_scrape.grid(row=0, column=2)
         # Tooltip for button
         CTkToolTip(self.button_scrape,
@@ -247,8 +247,9 @@ class App(ctk.CTk):
         handle errors which occur in downloading process
         """
         # Enable download button
-        self.button_download.configure(text="Download Images", state=tk.NORMAL)
+        # self.button_download.configure(text="Download Images", state=tk.NORMAL)
 
+        print("{}".format(error_message))
         # Show Error Dialog
         messagebox.showerror(
             "Downloading Failed", f"{error_message}")
@@ -296,10 +297,10 @@ class App(ctk.CTk):
             raise ValueError("Please Scraped the images first.")
 
         self.image_download_thread = Thread(
-            target=self.begin_image_download, args=(save_path, image_quality, step_callback))
+            target=self.download_images, args=(save_path, image_quality, step_callback))
         self.image_download_thread.start()
 
-    def begin_image_download(self, save_path, image_quality, step_callback):
+    def download_images(self, save_path, image_quality, step_callback):
         """
         ### Begin Download
         Start the downloading process in a new thread
@@ -307,10 +308,10 @@ class App(ctk.CTk):
         try:
             for index, image in enumerate(self.scraped_data):
                 filename = image['title'] + image['extension']
-                self.backend.download_images(image['image_url'],
-                                             filename, save_path)
+                self.backend.download_image(image['image_url'],
+                                            filename, save_path)
                 # Call the `step_callback` with an argument
-                step_callback(index)
+                step_callback(self.total_images)
 
         except Exception as e:
             self.after(0, self.handle_download_errors, e)
@@ -605,7 +606,7 @@ class DownloadDialog(ctk.CTkToplevel):
         self._button_cancel = ctk.CTkButton(self._mainframe,
                                             width=120, height=30,
                                             text="Cancel",
-                                            command=self.cancel)
+                                            command=self.close_dialog)
         self._button_cancel.grid(
             row=1, column=3, sticky="e", padx=10, pady=10)
         # Tooltip for Cancel button
@@ -662,6 +663,8 @@ class DownloadDialog(ctk.CTkToplevel):
         ### Start Download
         Gets user data and Starts the downloaders
         """
+        self.show_progress_bar()
+
         # ? Prepare to download > get user values
         # * Data Format
         format_ = self._options_menu.get()
@@ -690,17 +693,23 @@ class DownloadDialog(ctk.CTkToplevel):
             # Call Text downloader
             self.text_downloader(format_, filename_, directory_)
 
-    def on_progress(self, arg):
+    def on_progress(self, tasks_):
         """ 
         ### On Progress
-        Call this function everytime something is downloaded
+        call this function at each download
+        
+        ```
+        Takes `tasks_` which is the number of total tasks
+        ```
         """
-        print("Progress Incremented! {}".format(arg))
-        # Every time this function is called:
         # Increase the Progress
-        ...
+        tasks = tasks_
+        speed = 1
+        temp = round((speed/tasks)*100, 5)
+        self._progress_bar['value'] += temp
+        self.update_idletasks()
 
-    def cancel(self):
+    def close_dialog(self):
         """ 
         ### Cancel
         Close the dialog aka DESTROY!
