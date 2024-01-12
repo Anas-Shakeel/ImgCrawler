@@ -88,7 +88,7 @@ class Backend:
 
         return f"{formatted_size} {units[unit_index]}"
 
-    def download_images(self, image_url, filename, save_path):
+    def download_image(self, image_url, filename, save_path):
         """Downloads all images in local storage"""
         # Create folder
         if not path.exists(save_path):
