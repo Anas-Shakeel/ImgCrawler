@@ -312,7 +312,7 @@ class App(ctk.CTk):
                     image_url = image['image_url']
                 else:
                     filename = f"{image['title']} _Lq_{image['extension']}"
-                    image_url = image['image_url']
+                    image_url = image['lq_url']
                     
                 self.backend.download_image(image_url,
                                             filename, save_path)
