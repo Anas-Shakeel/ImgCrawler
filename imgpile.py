@@ -1,7 +1,45 @@
 """
-# API for imgpile.com 
-This api scraps the imgpile.com website and sends back a list of 
-dictionaries of images and their data.
+# Imgpile Custom API
+This `API (Application Programming interface)` scraps the [imgpile](https://imgpile.com/)
+website and returns a `json` response containing information about all images in an album.
+
+### Usage
+1. `Import` the API/Modules in your application
+2. Call `imgpile.get(url)` method. `url` is url of album.
+3. store the response and use however you see fit.
+
+### Input
+> `url` > url of the album you want to scrape
+
+### Output
+> `List(Dicts(key, value))` > a json like list/array of dictionaries/objects 
+containing the data.
+It should look something like below:
+
+``` json
+[
+    {
+        "image_url": "URL of image.extension",
+        "image_link": "Link to the image",
+        "thumb_url": "URL of thumbnail.extension",
+        "lq_url": "URL of low-quality image.extension",
+        "title": "Image title",
+        "size": "32.2 MB",
+        "resolution": "5232 x 7845",
+        "image_type": "JPG",
+        "views": "View count of this image",
+        "likes": "Like count of this image",
+        "uploader": "Name of uploader of this image",
+        "uploaded": "1 year ago"
+    },
+    {
+        image #2
+    },
+    {
+        image #3
+    }
+]
+```
 """
 
 import requests
@@ -20,7 +58,7 @@ class ImgPile:
         """
         self.logwindow = logwidget
         self.logwindow.write("[Info] Starting Page Crawl...\n")
-        
+
         # Extract all pages
         pages = self.extract_pages(url)
 
@@ -106,7 +144,8 @@ class ImgPile:
 
         # * EXTRACTING BEGINS
         title = soup.find("h1", class_="viewer-title").text
-        uploader = soup.find("span", class_="breadcrum-text float-left").text.strip()
+        uploader = soup.find(
+            "span", class_="breadcrum-text float-left").text.strip()
 
         # Image metadata
         image_metadata = soup.find(
