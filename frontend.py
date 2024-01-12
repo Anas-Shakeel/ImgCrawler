@@ -306,9 +306,15 @@ class App(ctk.CTk):
         Start the downloading process in a new thread
         """
         try:
-            for index, image in enumerate(self.scraped_data):
-                filename = image['title'] + image['extension']
-                self.backend.download_image(image['image_url'],
+            for image in self.scraped_data:
+                if image_quality.lower() == "High Quality":
+                    filename = image['title'] + image['extension']
+                    image_url = image['image_url']
+                else:
+                    filename = f"{image['title']} _Lq_{image['extension']}"
+                    image_url = image['image_url']
+                    
+                self.backend.download_image(image_url,
                                             filename, save_path)
                 # Call the `step_callback` with an argument
                 step_callback(self.total_images)
@@ -681,7 +687,7 @@ class DownloadDialog(ctk.CTkToplevel):
         directory_ = self._dir_field.get_dir()
         if not directory_:
             # None value, Raise error!
-            ...
+            raise NotADirectoryError("Directory not found!")
             return
 
         # Call Download_callback with values
