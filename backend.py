@@ -9,7 +9,6 @@ from os import mkdir
 from os import path
 import json
 import pandas as pd
-from io import StringIO
 
 
 class Backend:
@@ -81,7 +80,7 @@ class Backend:
         if not image_url:
             print(f"Image: '{filename}' has no URL on website, **Skipping**")
             return
-        
+
         # Create folder
         if not path.exists(save_path):
             os.mkdir(save_path)
