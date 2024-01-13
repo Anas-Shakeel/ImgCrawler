@@ -298,7 +298,7 @@ class App(ctk.CTk):
         try:
             # Reset the progress bar (if downloading again!)
             self.download_dialog.reset_progress_bar()
-            
+
             # Download imnages
             for image in self.scraped_data:
                 if image_quality.lower() == "High Quality":
@@ -312,15 +312,23 @@ class App(ctk.CTk):
                                             filename, save_path)
                 # Increase progress (progressbar)
                 step_callback(self.total_images)
-            
-            # Call hide after one second
-            self.after(1000, self.download_dialog.hide_progress_bar)
+
+            self.download_completed()
             self.update_idletasks()
-            # TODO > Show Download Complete Popup!
-            ...
 
         except Exception as e:
             self.after(0, self.handle_download_errors, e)
+
+    def download_completed(self,):
+        """ 
+        ### Download Completed
+        Code to execute when the download is completed
+        """
+        # TODO > Show Download Complete Popup!
+        messagebox.showinfo("Download Complete",
+                            "Your Download has been completed.")
+        # self.update_idletasks()
+        self.after(500, self.download_dialog.hide_progress_bar)
 
     def text_downloader(self, format_, filename_, directory_):
         """
@@ -676,8 +684,6 @@ class DownloadDialog(ctk.CTkToplevel):
         ### Start Download
         Gets user data and Starts the downloaders
         """
-        self.show_progress_bar()
-
         # ? Prepare to download > get user values
         # * Data Format
         format_ = self._options_menu.get()
@@ -697,7 +703,8 @@ class DownloadDialog(ctk.CTkToplevel):
             raise NotADirectoryError("Directory not found!")
             return
 
-        # Call Download_callback with values
+        # Initiate Download
+        self.show_progress_bar()
         if format_ == "IMAGE":
             # Call Image downloader
             self.image_downloader(directory_, quality_, self.on_progress)
