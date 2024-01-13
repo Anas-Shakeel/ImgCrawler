@@ -77,6 +77,11 @@ class Backend:
 
     def download_image(self, image_url, filename, save_path):
         """Downloads all images in local storage"""
+        # URL Check
+        if not image_url:
+            print(f"Image: '{filename}' has no URL on website, **Skipping**")
+            return
+        
         # Create folder
         if not path.exists(save_path):
             os.mkdir(save_path)
