@@ -695,12 +695,17 @@ class DownloadDialog(ctk.CTkToplevel):
         else:
             # Get Filename
             filename_ = self._entry_filename.get()
+            if not filename_:
+                messagebox.showerror(
+                    "Invalid Filename", "Filename not found.\nPlease enter a filename for your file.")
+                return
 
         # * Get Save Path
         directory_ = self._dir_field.get_dir()
         if not directory_:
             # None value, Raise error!
-            raise NotADirectoryError("Directory not found!")
+            messagebox.showerror(
+                "Invalid Directory", "Directory not found.\nPlease enter a folder to save your data.")
             return
 
         # Initiate Download
