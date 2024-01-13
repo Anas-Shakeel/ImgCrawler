@@ -704,8 +704,8 @@ class DownloadDialog(ctk.CTkToplevel):
             return
 
         # Initiate Download
-        self.show_progress_bar()
         if format_ == "IMAGE":
+            self.show_progress_bar()
             # Call Image downloader
             self.image_downloader(directory_, quality_, self.on_progress)
 
@@ -717,17 +717,9 @@ class DownloadDialog(ctk.CTkToplevel):
         """ 
         ### On Progress
         call this function at each download
-
-        ```
-        Takes `tasks_` which is the number of total tasks
-        ```
         """
         # Increase the Progress
-        tasks = tasks_
-        speed = 1
-        temp = round((speed/tasks)*100, 5)
-        self._progress_bar['value'] += temp
-        self.update_idletasks()
+        self._progress_bar['value'] += round((1/tasks_)*100, 5)
 
     def close_dialog(self):
         """ 
