@@ -276,7 +276,7 @@ class App(ctk.CTk):
                                               self.text_downloader)
 
     def image_downloader(self, save_path, image_quality,  step_callback):
-        """ 
+        """
         ### Image Downloader
         Begin image downloading process/thread.
 
@@ -320,7 +320,7 @@ class App(ctk.CTk):
             self.after(0, self.handle_download_errors, e)
 
     def download_completed(self,):
-        """ 
+        """
         ### Download Completed
         Code to execute when the download is completed
         """
@@ -347,7 +347,7 @@ class App(ctk.CTk):
             self.handle_download_errors(error)
 
     def show_popup(self, message):
-        """ 
+        """
         ### Show Popup
         Shows a popup dialog displaying `message`
         """
@@ -401,7 +401,7 @@ class ImageBox(ctk.CTkFrame):
 
 
 class DirectoryField(ctk.CTkFrame):
-    """ 
+    """
     ### Directory Field Widget
     A Custom-Widget used to take directory input from user
     """
@@ -453,7 +453,7 @@ class DirectoryField(ctk.CTkFrame):
             print(f"error: {e}")
 
     def get_dir(self):
-        """ 
+        """
         ### Get Directory
         Returns the directory entered in the directory field
         """
@@ -461,7 +461,7 @@ class DirectoryField(ctk.CTkFrame):
 
 
 class TextBoxFrame(ctk.CTkFrame):
-    """ 
+    """
     ### TextBox Frame
     A Custom-Widget used to create a textbox frame
     """
@@ -484,7 +484,7 @@ class TextBoxFrame(ctk.CTkFrame):
         self.rowconfigure(1, weight=1)
 
     def write(self, data):
-        """ 
+        """
         ### Write
         Write `data` into the textbox of this widget.
         """
@@ -493,7 +493,7 @@ class TextBoxFrame(ctk.CTkFrame):
         self.text_area.configure(state="disabled")
 
     def delete_everything(self):
-        """ 
+        """
         ### Clear
         Clears the text in the textbox of this widget.
         """
@@ -537,7 +537,7 @@ class PopupDialog(ctk.CTkToplevel):
 
 
 class DownloadDialog(ctk.CTkToplevel):
-    """ 
+    """
     ### Download Dialog
     Download Popup Dialog custom widget for various downloading options & fields
     """
@@ -657,7 +657,7 @@ class DownloadDialog(ctk.CTkToplevel):
         self.geometry(geo_string)
 
     def show_progress_bar(self):
-        """ 
+        """
         ### Show Progress bar
         shows the progress bar
         """
@@ -665,7 +665,7 @@ class DownloadDialog(ctk.CTkToplevel):
         self._progress_bar.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
 
     def hide_progress_bar(self):
-        """ 
+        """
         ### Hide Progress bar
         hides the progress bar
         """
@@ -673,14 +673,14 @@ class DownloadDialog(ctk.CTkToplevel):
         self._progress_bar.grid_forget()
 
     def reset_progress_bar(self):
-        """ 
+        """
         ### Reset Progress Bar
         Reset the progress bar back to default state
         """
         self._progress_bar['value'] = 0
 
     def start_download(self):
-        """ 
+        """
         ### Start Download
         Gets user data and Starts the downloaders
         """
@@ -714,7 +714,7 @@ class DownloadDialog(ctk.CTkToplevel):
             self.text_downloader(format_, filename_, directory_)
 
     def on_progress(self, tasks_):
-        """ 
+        """
         ### On Progress
         call this function at each download
         """
@@ -722,8 +722,8 @@ class DownloadDialog(ctk.CTkToplevel):
         self._progress_bar['value'] += round((1/tasks_)*100, 5)
 
     def close_dialog(self):
-        """ 
-        ### Cancel
+        """
+        ### Close Dialog
         Close the dialog aka DESTROY!
         """
         self.destroy()
