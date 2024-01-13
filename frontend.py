@@ -281,12 +281,11 @@ class App(ctk.CTk):
         Begin image downloading process/thread.
 
         ```
+        save_path = path to save images
+        image_quality = quality of images to download
         step_callback = called everytime an image is downloaded
         ```
         """
-        if not self.scraped_data:
-            raise ValueError("Please Scraped the images first.")
-
         self.image_download_thread = Thread(
             target=self.download_images, args=(save_path, image_quality, step_callback))
         self.image_download_thread.start()
@@ -302,13 +301,14 @@ class App(ctk.CTk):
                     filename = image['title'] + image['extension']
                     image_url = image['image_url']
                 else:
-                    filename = f"{image['title']} _Lq_{image['extension']}"
+                    filename = f"{image['title']}_Lq_{image['extension']}"
                     image_url = image['lq_url']
 
                 self.backend.download_image(image_url,
                                             filename, save_path)
                 # Call the `step_callback` with an argument
                 step_callback(self.total_images)
+            self.download_dialog.hide_progress_bar()
 
         except Exception as e:
             self.after(0, self.handle_download_errors, e)
@@ -521,8 +521,8 @@ class PopupDialog(ctk.CTkToplevel):
 
 class DownloadDialog(ctk.CTkToplevel):
     """ 
-    ### Download Popup
-    Download Popup custom widget for various downloading options & fields
+    ### Download Dialog
+    Download Popup Dialog custom widget for various downloading options & fields
     """
 
     def __init__(self, master, image_downlod_callback, text_download_callback, *args, **kwargs):
