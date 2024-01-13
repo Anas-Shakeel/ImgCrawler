@@ -81,7 +81,6 @@ class Backend:
         if not path.exists(save_path):
             os.mkdir(save_path)
 
-        # directory
         directory = path.join(save_path, filename)
 
         # If file does not exists, download
