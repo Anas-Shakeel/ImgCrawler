@@ -296,6 +296,10 @@ class App(ctk.CTk):
         Start the downloading process in a new thread
         """
         try:
+            # Reset the progress bar (if downloading again!)
+            self.download_dialog.reset_progress_bar()
+            
+            # Download imnages
             for image in self.scraped_data:
                 if image_quality.lower() == "High Quality":
                     filename = image['title'] + image['extension']
@@ -306,9 +310,14 @@ class App(ctk.CTk):
 
                 self.backend.download_image(image_url,
                                             filename, save_path)
-                # Call the `step_callback` with an argument
+                # Increase progress (progressbar)
                 step_callback(self.total_images)
-            self.download_dialog.hide_progress_bar()
+            
+            # Call hide after one second
+            self.after(1000, self.download_dialog.hide_progress_bar)
+            self.update_idletasks()
+            # TODO > Show Download Complete Popup!
+            ...
 
         except Exception as e:
             self.after(0, self.handle_download_errors, e)
@@ -654,6 +663,13 @@ class DownloadDialog(ctk.CTkToplevel):
         """
         # Place the bar
         self._progress_bar.grid_forget()
+
+    def reset_progress_bar(self):
+        """ 
+        ### Reset Progress Bar
+        Reset the progress bar back to default state
+        """
+        self._progress_bar['value'] = 0
 
     def start_download(self):
         """ 
