@@ -144,15 +144,6 @@ class App(ctk.CTk):
         else:
             return False
 
-    def scrape_dummy(self):
-        """ 
-        ### Scrape Dummy
-        Get the Dummy Data from backend
-        """
-        dummy = self.backend.get_dummy_response()
-
-        self.after(0, self.update_gui, dummy)
-
     def start_scraping(self, _=None):
         """
         ### Start Scraping
@@ -313,7 +304,7 @@ class App(ctk.CTk):
                 else:
                     filename = f"{image['title']} _Lq_{image['extension']}"
                     image_url = image['lq_url']
-                    
+
                 self.backend.download_image(image_url,
                                             filename, save_path)
                 # Call the `step_callback` with an argument
@@ -703,7 +694,7 @@ class DownloadDialog(ctk.CTkToplevel):
         """ 
         ### On Progress
         call this function at each download
-        
+
         ```
         Takes `tasks_` which is the number of total tasks
         ```
