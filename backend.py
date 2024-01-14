@@ -91,7 +91,7 @@ class Backend:
         ```
         """
         if not path.exists(filepath):
-            return filename
+            return filepath
 
         # Extract filename and extension
         filename = path.splitext(path.basename(filepath))[0]
@@ -117,11 +117,11 @@ class Backend:
         else:
             return new_name
 
-    def sanitize_string(self, string:str):
+    def sanitize_string(self, string: str):
         """ 
         ### Sanitize String
         Replaces all invalid (illegal) characters from `string` with underscores `_`.
-        
+
         ```
         # Illegal characters
         invalid_chars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
@@ -129,11 +129,12 @@ class Backend:
         """
         invalid_chars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
 
+        sanitized_string = string
         # Replace invalid characters with underscores
         for char in invalid_chars:
-            string.replace(char, "_")
+            sanitized_string = sanitized_string.replace(char, "_")
 
-        return string
+        return sanitized_string
 
     def download_image(self, image_url, filename, save_path):
         """Downloads all images in local storage"""
