@@ -302,10 +302,11 @@ class App(ctk.CTk):
             # Download imnages
             for image in self.scraped_data:
                 if image_quality.lower() == "High Quality":
-                    filename = image['title'] + image['extension']
+                    filename = self.backend.sanitize_string(
+                        image['title']) + image['extension']
                     image_url = image['image_url']
                 else:
-                    filename = f"{image['title']}_Lq_{image['extension']}"
+                    filename = f"{self.backend.sanitize_string(image['title'])}_Lq_{image['extension']}"
                     image_url = image['lq_url']
 
                 self.backend.download_image(image_url,
