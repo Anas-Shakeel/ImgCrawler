@@ -167,7 +167,7 @@ class Backend:
             raise ValueError(
                 "save_path: value must be an existing directory path.")
 
-        save_dir = path.join(save_path, filename)
+        save_dir = path.join(save_path, self.sanitize_string(filename))
 
         if fileformat == "JSON":
             # * Download as json
