@@ -320,7 +320,7 @@ class App(ctk.CTk):
         except Exception as e:
             self.after(0, self.handle_download_errors, e)
 
-    def download_completed(self,):
+    def download_completed(self):
         """
         ### Download Completed
         Code to execute when the download is completed
@@ -329,7 +329,8 @@ class App(ctk.CTk):
         messagebox.showinfo("Download Complete",
                             "Your Download has been completed.")
         # self.update_idletasks()
-        self.after(500, self.download_dialog.hide_progress_bar)
+        self.after(0, self.download_dialog.hide_progress_bar)
+        self.download_dialog._button_download.configure(state="normal")
 
     def text_downloader(self, format_, filename_, directory_):
         """
@@ -685,38 +686,33 @@ class DownloadDialog(ctk.CTkToplevel):
         ### Start Download
         Gets user data and Starts the downloaders
         """
-        # ? Prepare to download > get user values
         # * Data Format
         format_ = self._options_menu.get()
 
         quality_, filename_ = None, None
         if format_ == "IMAGE":
-            # Get Quality
             quality_ = self._options_quality.get()
         else:
-            # Get Filename
             filename_ = self._entry_filename.get()
             if not filename_:
-                messagebox.showerror(
-                    "Invalid Filename", "Filename not found.\nPlease enter a filename for your file.")
+                messagebox.showerror("Invalid Filename",
+                                     "Filename not found.\nPlease enter a filename for your file.")
                 return
 
         # * Get Save Path
         directory_ = self._dir_field.get_dir()
         if not directory_:
-            # None value, Raise error!
             messagebox.showerror(
                 "Invalid Directory", "Directory not found.\nPlease enter a folder to save your data.")
             return
 
         # Initiate Download
+        self._button_download.configure(state="disabled")
         if format_ == "IMAGE":
             self.show_progress_bar()
-            # Call Image downloader
             self.image_downloader(directory_, quality_, self.on_progress)
 
         else:
-            # Call Text downloader
             self.text_downloader(format_, filename_, directory_)
 
     def on_progress(self, tasks_):
