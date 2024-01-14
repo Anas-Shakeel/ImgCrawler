@@ -5,7 +5,6 @@ Handles all the backend logics
 from imgpile import ImgPile
 import requests
 import os
-from os import mkdir
 from os import path
 import json
 import pandas as pd
@@ -74,6 +73,50 @@ class Backend:
 
         return f"{formatted_size} {units[unit_index]}"
 
+    def filename_increment(self, filepath: str, dst_path=""):
+        """
+        ### Filename Increment
+        Adds an incremented number in the `filepath` if file already exists in `dst_path`
+
+        if `dst_path` is omitted, method will use the `filepath`'s root dir to look 
+        if filename exists or not
+
+        ```
+        >> FileManager.filename_increment("C:\\file.txt")
+        # if file already exists, return another name (incremented)
+        'C:\\file 0.txt'
+
+        # otherwise return same name
+        'C:\\file.txt'
+        ```
+        """
+        if not path.exists(filepath):
+            return filename
+
+        # Extract filename and extension
+        filename = path.splitext(path.basename(filepath))[0]
+        ext = path.splitext(filepath)[-1]
+
+        # Set root path
+        if dst_path == "":
+            root = path.split(filepath)[0]
+        else:
+            root = dst_path
+
+        # Creating new_name
+        new_name = path.join(root, filename + ext)
+
+        # If file exists, Increment
+        if path.exists(new_name):
+            i = 0
+            while (i >= 0):
+                new_name = f"{path.join(root, filename)} {i}{ext}"
+                if not path.exists(new_name):
+                    return new_name
+                i += 1
+        else:
+            return new_name
+
     def download_image(self, image_url, filename, save_path):
         """Downloads all images in local storage"""
         # URL Check
@@ -85,7 +128,8 @@ class Backend:
         if not path.exists(save_path):
             os.mkdir(save_path)
 
-        directory = path.join(save_path, filename)
+        # Create a dirpath, also check if it already exists
+        directory = self.filename_increment(path.join(save_path, filename))
 
         # If file does not exists, download
         if not path.exists(directory):
