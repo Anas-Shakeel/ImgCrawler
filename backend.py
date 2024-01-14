@@ -117,10 +117,10 @@ class Backend:
         else:
             return new_name
 
-    def sanitize_filename(self, filepath:str):
+    def sanitize_string(self, string:str):
         """ 
-        ### Sanitize Filename
-        Removes all invalid (illegal) characters from a filename.
+        ### Sanitize String
+        Replaces all invalid (illegal) characters from `string` with underscores `_`.
         
         ```
         # Illegal characters
@@ -131,9 +131,9 @@ class Backend:
 
         # Replace invalid characters with underscores
         for char in invalid_chars:
-            filepath.replace(char, "_")
+            string.replace(char, "_")
 
-        return filepath
+        return string
 
     def download_image(self, image_url, filename, save_path):
         """Downloads all images in local storage"""
