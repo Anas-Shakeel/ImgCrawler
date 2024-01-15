@@ -347,7 +347,8 @@ class App(ctk.CTk):
                                              args=(self.scraped_data,
                                                    format_,
                                                    filename_,
-                                                   directory_))
+                                                   directory_,
+                                                   self.download_completed))
             data_downloading_thread.start()
 
         except Exception as error:
