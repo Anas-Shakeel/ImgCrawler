@@ -158,7 +158,7 @@ class Backend:
             with open(directory, 'wb') as img:
                 img.write(raw_image_data)
 
-    def download_data(self, data, fileformat, filename, save_path):
+    def download_data(self, data, fileformat, filename, save_path, download_complete_callback):
         """ 
         ### Download DATA
         Downloads the `data` with the `filename` in `format` format in `save_path`
@@ -185,3 +185,6 @@ class Backend:
             # Other cases
             raise ValueError(
                 "Invalid Format Type: format must be 'JSON' or 'CSV'.")
+        
+        # Call `Download Complete Callback` method
+        download_complete_callback()
