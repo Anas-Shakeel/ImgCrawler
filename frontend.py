@@ -12,6 +12,7 @@ import requests
 from io import BytesIO
 from PIL import Image
 from time import sleep
+import pyperclip
 
 
 class App(ctk.CTk):
@@ -133,6 +134,10 @@ class App(ctk.CTk):
         # * Status bar
         self.status_bar = ctk.CTkFrame(self, height=25)
         self.status_bar.grid(sticky="ew")
+
+        # * Keyboard & Mouse Bindings (Shortcuts)
+        # Shortcut Binding for entry url
+        self.entry_url.bind("<Double-Button-3>", self.paste_to_entry_url)
 
     def validate_url(self, url: str):
         """ Validate URL """
@@ -372,7 +377,15 @@ class App(ctk.CTk):
         y = self.winfo_screenheight() // 2
 
         return x, y
-
+    
+    def paste_to_entry_url(self, _=None):
+        """ 
+        ### Paste to Entry Url
+        Paste the text copied to clipboard into entry on `Right-Mouse-Click`
+        """
+        # Get text from clipboard & insert
+        self.entry_url.insert(0, pyperclip.paste())
+    
     def exit_app(self):
         """ Method for exiting the application the right way """
         self.destroy()
