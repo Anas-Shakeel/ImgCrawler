@@ -403,6 +403,7 @@ class App(ctk.CTk):
         Paste the text copied to clipboard into entry on `Right-Mouse-Click`
         """
         # Get text from clipboard & insert
+        self.entry_url.delete(0, "end")
         self.entry_url.insert(0, pyperclip.paste())
 
     def exit_app(self):
