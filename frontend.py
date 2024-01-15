@@ -135,6 +135,13 @@ class App(ctk.CTk):
         self.status_bar = ctk.CTkFrame(self, height=25)
         self.status_bar.grid(sticky="ew")
 
+        # Scrape Progress bar
+        self.scrape_progress_bar = ctk.CTkProgressBar(self.status_bar,
+                                                      height=10,
+                                                      mode="indeterminate",
+                                                      corner_radius=2)
+        self.status_bar.columnconfigure(0, weight=1)
+
         # * Keyboard & Mouse Bindings (Shortcuts)
         # Shortcut Binding for entry url
         self.entry_url.bind("<Double-Button-3>", self.paste_to_entry_url)
@@ -165,6 +172,10 @@ class App(ctk.CTk):
         self.button_scrape.configure(
             text="Please wait...", state=tk.DISABLED)
 
+        # Instantiate the progress bar
+        self.scrape_progress_bar.grid(
+            row=0, column=0, padx=10, pady=5, sticky="ew")
+        self.scrape_progress_bar.start()
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
             url, self.textbox_log))
@@ -187,9 +198,11 @@ class App(ctk.CTk):
         # Enable scrape button
         self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
 
+        # Disable the progres bar
+        self.scrape_progress_bar.grid_forget()
+
         # Save the response "class"ically :)
         self.scraped_data = result
-        # Do some calculations regarding the data
         self.update_properties()
         self.textbox_log.write(
             f"\n[Info] Total Extracted Images: {self.total_images}")
@@ -378,7 +391,7 @@ class App(ctk.CTk):
         y = self.winfo_screenheight() // 2
 
         return x, y
-    
+
     def paste_to_entry_url(self, _=None):
         """ 
         ### Paste to Entry Url
@@ -386,7 +399,7 @@ class App(ctk.CTk):
         """
         # Get text from clipboard & insert
         self.entry_url.insert(0, pyperclip.paste())
-    
+
     def exit_app(self):
         """ Method for exiting the application the right way """
         self.destroy()
@@ -722,10 +735,9 @@ class DownloadDialog(ctk.CTkToplevel):
 
         # Initiate Download
         self._button_download.configure(state="disabled")
+        self.show_progress_bar()
         if format_ == "IMAGE":
-            self.show_progress_bar()
             self.image_downloader(directory_, quality_, self.on_progress)
-
         else:
             self.text_downloader(format_, filename_, directory_)
 
