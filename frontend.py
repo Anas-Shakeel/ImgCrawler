@@ -193,13 +193,18 @@ class App(ctk.CTk):
             # In-case of errors, call error handler
             self.after(0, self.handle_scrape_errors, e)
 
+    def scrape_completed(self):
+        """ 
+        ### Scrape Completed
+        Code to run when the scraping process is finished
+        """
+        self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
+        self.scrape_progress_bar.grid_forget()
+        messagebox.showinfo("Scraping Complete", "Target URL has been scraped successfully.")
+
     def update_gui(self, result=None):
         """ Updates the GUI """
-        # Enable scrape button
-        self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
-
-        # Disable the progres bar
-        self.scrape_progress_bar.grid_forget()
+        self.scrape_completed()
 
         # Save the response "class"ically :)
         self.scraped_data = result
