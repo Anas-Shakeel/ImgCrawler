@@ -22,15 +22,46 @@ class Backend:
         """
         return self.img_api.get(url, logwidget)
 
-    def get_presaved_data(self, filepath: str):
+    def get_presaved_data(self, filepath: str) -> list:
         """ 
         ### Get Presaved Data
         Reads `filepath` and returns the json data
         """
         # Open & read the file
         with open(filepath) as datafile:
-            # Return the pyobject
-            return json.loads(datafile.read())
+            # Get the data
+            data = json.loads(datafile.read())
+
+        # Validate the data
+        if not self.validate_presaved_data(data):
+            # Failed Validation
+            return None
+
+        # Return the pyobject "DATA"
+        return data
+
+    def validate_presaved_data(self, data: list) -> bool:
+        """ 
+        ### Validate Presaved Data
+        validates the data format and returns `True` or `False`
+
+        #### Validation Conditions:
+        - TODO
+        """
+        if not (type(data) == list and type(data[0]) == dict):
+            # Datatypes are not valid
+            return False
+
+        for dict_item in data:
+            if len(dict_item.keys()) != 13:
+                # Lengths are not good.
+                return False
+
+            if not (dict_item['image_url'] and dict_item['image_link']):
+                # Image_url is not ok
+                return False
+
+            return True
 
     def to_bytes(self, _size, _unit: str):
         """
@@ -195,6 +226,6 @@ class Backend:
             # Other cases
             raise ValueError(
                 "Invalid Format Type: format must be 'JSON' or 'CSV'.")
-        
+
         # Call `Download Complete Callback` method
         download_complete_callback()
