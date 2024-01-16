@@ -22,6 +22,16 @@ class Backend:
         """
         return self.img_api.get(url, logwidget)
 
+    def get_presaved_data(self, filepath: str):
+        """ 
+        ### Get Presaved Data
+        Reads `filepath` and returns the json data
+        """
+        # Open & read the file
+        with open(filepath) as datafile:
+            # Return the pyobject
+            return json.loads(datafile.read())
+
     def to_bytes(self, _size, _unit: str):
         """
         ### To Bytes
