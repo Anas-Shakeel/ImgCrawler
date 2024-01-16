@@ -149,7 +149,7 @@ class App(ctk.CTk):
         self.bind("<Control-Shift-l>", self.load_presaved_data)
         self.bind("<Control-Shift-L>", self.load_presaved_data)
 
-    def load_presaved_data(self, event=None):
+    def load_presaved_data(self, _=None):
         """ 
         ### Load Presaved Data
         Loads a presaved json data to avoid scraping again!
@@ -162,6 +162,10 @@ class App(ctk.CTk):
         if not filepath:
             return
         presaved_data = self.backend.get_presaved_data(filepath=filepath)
+        if presaved_data == None:
+            messagebox.showerror("Load Failed",
+                                 "Your json file did not loaded. This app supports json files created by this app only or a file with similar format.")
+            return
 
         # * Load Data in the App!
         self.scraped_data = presaved_data
