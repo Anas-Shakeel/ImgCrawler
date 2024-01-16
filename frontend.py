@@ -145,6 +145,45 @@ class App(ctk.CTk):
         # * Keyboard & Mouse Bindings (Shortcuts)
         # Shortcut Binding for entry url
         self.entry_url.bind("<Double-Button-3>", self.paste_to_entry_url)
+        # Root Bindings
+        self.bind("<Control-Shift-l>", self.load_presaved_data)
+        self.bind("<Control-Shift-L>", self.load_presaved_data)
+
+    def load_presaved_data(self, event=None):
+        """ 
+        ### Load Presaved Data
+        Loads a presaved json data to avoid scraping again!
+
+        `Data` must be in a json format similar to that json created by this app.
+        """
+        # * Get Data from Backend
+        filepath = filedialog.askopenfilename(title="Open a Json File",
+                                              filetypes=[("Json Files", "*.json")])
+        if not filepath:
+            return
+        presaved_data = self.backend.get_presaved_data(filepath=filepath)
+
+        # * Load Data in the App!
+        self.scraped_data = presaved_data
+        self.update_properties()
+
+        self.textbox_log.write("[Info] Loading Json Data...\n")
+        self.textbox_log.write("[Info] Json Data Loaded\n")
+        self.textbox_log.write(
+            f"\n[Info] Total Images: {self.total_images}")
+        self.textbox_log.write(
+            f"\n[Info] Total Size of Images: {self.total_size}\n\n")
+        self.textbox_api_data.delete_everything()
+        self.textbox_api_data.write(f"Response from API:\n")
+        self.textbox_api_data.write(json.dumps(self.scraped_data, indent=4))
+
+        self.show_images()
+
+        self.view_frame.configure(
+            label_text=f"{self.total_images} images were loaded")
+
+        messagebox.showinfo("Load Success",
+                            "Your json file has been successfully loaded into the app. You can now download the images or csv.")
 
     def validate_url(self, url: str):
         """ Validate URL """
@@ -200,7 +239,8 @@ class App(ctk.CTk):
         """
         self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
         self.scrape_progress_bar.grid_forget()
-        messagebox.showinfo("Scraping Complete", "Target URL has been scraped successfully.")
+        messagebox.showinfo("Scraping Complete",
+                            "Target URL has been scraped successfully.")
 
     def update_gui(self, result=None):
         """ Updates the GUI """
@@ -529,7 +569,7 @@ class TextBoxFrame(ctk.CTkFrame):
 
     def delete_everything(self):
         """
-        ### Clear
+        ### Delete Everything
         Clears the text in the textbox of this widget.
         """
         self.text_area.configure(state=tk.NORMAL)
