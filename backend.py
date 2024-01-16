@@ -46,7 +46,10 @@ class Backend:
         validates the data format and returns `True` or `False`
 
         #### Validation Conditions:
-        - TODO
+        - `data` must be of type `list`
+        - `list[0]` must be a `dict`
+        - `list[0]` must have 13 `dict`s
+        - `list[0]` must contain `image_url` & `image_link` keys along with 11.
         """
         if not (type(data) == list and type(data[0]) == dict):
             # Datatypes are not valid
