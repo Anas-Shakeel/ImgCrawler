@@ -317,8 +317,9 @@ class App(ctk.CTk):
         """ Start Image Displayer Thread """
         # Create a image event, to stop thread at will... :)
         self.show_image_event = Event()
-        
-        display_thread = Thread(target=self.show_images_in_background, args=(self.show_image_event, ))
+
+        display_thread = Thread(
+            target=self.show_images_in_background, args=(self.show_image_event, ))
         display_thread.start()
 
     def show_images_in_background(self, event: Event):
@@ -464,7 +465,10 @@ class App(ctk.CTk):
         threads (if running)
         """
         # Kill the show_image Thread
-        self.show_image_event.set()
+        try:
+            self.show_image_event.set()
+        except AttributeError:
+            pass
 
         # Wait for the main_thread to come into mainloop!
         self.update()
