@@ -10,7 +10,7 @@ from os.path import normpath
 from threading import Thread
 import requests
 from io import BytesIO
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from time import sleep
 import pyperclip
 
@@ -219,6 +219,7 @@ class App(ctk.CTk):
         self.scrape_progress_bar.grid(
             row=0, column=0, padx=10, pady=5, sticky="ew")
         self.scrape_progress_bar.start()
+        
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
             url, self.textbox_log))
@@ -467,10 +468,20 @@ class ImageBox(ctk.CTkFrame):
         self.create_widgets()
 
     def load_image(self):
-        raw_data = requests.get(self.thumb_url).content
-        image = Image.open(BytesIO(raw_data))
+        """ 
+        ### Load image
+        Open the image and hold the reference in `self.image`
+        """
+        try:
+            raw_data = requests.get(self.thumb_url).content
+            image = Image.open(BytesIO(raw_data))
 
-        self.image = ctk.CTkImage(image, size=(180, 180))
+            self.image = ctk.CTkImage(image, size=(180, 180))
+        except Exception as e:
+            print("Error ocurred: {}".format(e))
+            # Load default image thumbnail
+            image = Image.open("assets\\thumb_preview.jpg")
+            self.image = ctk.CTkImage(image, size=(180, 180))
 
     def create_widgets(self):
         self.canvas = ctk.CTkLabel(
