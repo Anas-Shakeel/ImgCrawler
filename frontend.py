@@ -458,7 +458,11 @@ class App(ctk.CTk):
         self.entry_url.insert(0, pyperclip.paste())
 
     def exit_app(self):
-        """ Method for exiting the application the right way """
+        """
+        ### Exit App
+        Close the application by destroying everything and killing all background
+        threads (if running)
+        """
         # Kill the show_image Thread
         self.show_image_event.set()
 
