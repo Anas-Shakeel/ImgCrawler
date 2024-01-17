@@ -219,7 +219,7 @@ class App(ctk.CTk):
         self.scrape_progress_bar.grid(
             row=0, column=0, padx=10, pady=5, sticky="ew")
         self.scrape_progress_bar.start()
-        
+
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
             url, self.textbox_log))
