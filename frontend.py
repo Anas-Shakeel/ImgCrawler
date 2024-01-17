@@ -7,10 +7,10 @@ from CTkToolTip import CTkToolTip
 from backend import Backend
 import json
 from os.path import normpath
-from threading import Thread
+from threading import Thread, Event
 import requests
 from io import BytesIO
-from PIL import Image, UnidentifiedImageError
+from PIL import Image
 from time import sleep
 import pyperclip
 
@@ -315,12 +315,18 @@ class App(ctk.CTk):
 
     def show_images(self):
         """ Start Image Displayer Thread """
-        display_thread = Thread(target=self.show_images_in_background)
+        # Create a image event, to stop thread at will... :)
+        self.show_image_event = Event()
+        
+        display_thread = Thread(target=self.show_images_in_background, args=(self.show_image_event, ))
         display_thread.start()
 
-    def show_images_in_background(self):
+    def show_images_in_background(self, event: Event):
         """ Displays images in `view_frame` in background """
         for index, image in enumerate(self.scraped_data):
+            # If event is set, stop immediately!
+            if event.is_set():
+                break
             ImageBox(self.view_frame,
                      thumb_url=image['thumb_url'],).grid(row=0, column=index, padx=5)
 
@@ -453,7 +459,12 @@ class App(ctk.CTk):
 
     def exit_app(self):
         """ Method for exiting the application the right way """
-        self.destroy()
+        # Kill the show_image Thread
+        self.show_image_event.set()
+
+        # Wait for the main_thread to come into mainloop!
+        self.update()
+        self.after(1500, self.destroy)
 
 
 class ImageBox(ctk.CTkFrame):
