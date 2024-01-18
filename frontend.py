@@ -854,3 +854,15 @@ class DownloadDialog(ctk.CTkToplevel):
         Close the dialog aka DESTROY!
         """
         self.destroy()
+
+
+class ImageItemFrame(ctk.CTkFrame):
+    """ 
+    ### Image Item Frame
+    This custom widget will be a image item frame that will display the information
+    about an image in a more UI friendly way.
+    """
+    def __init__(self, master, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+        
+        ...
