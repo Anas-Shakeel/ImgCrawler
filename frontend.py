@@ -148,6 +148,16 @@ class App(ctk.CTk):
         # Root Bindings
         self.bind("<Control-Shift-l>", self.load_presaved_data)
         self.bind("<Control-Shift-L>", self.load_presaved_data)
+        self.bind("<Control-d>", self.debug_method)
+        self.bind("<Control-D>", self.debug_method)
+
+    def debug_method(self, event=None):
+        """ 
+        ### Debug method
+        Method which contains the code for debug purposes
+        """
+        image_links = [link['thumb_url'] for link in self.scraped_data]
+        self.image_view = ImageViewWindow(self, image_links)
 
     def load_presaved_data(self, _=None):
         """ 
@@ -181,7 +191,8 @@ class App(ctk.CTk):
         self.textbox_api_data.write(f"Response from API:\n")
         self.textbox_api_data.write(json.dumps(self.scraped_data, indent=4))
 
-        self.show_images()
+        # ! Shows the loaded images :: CLEANUP AFTER DEBUGGING !
+        # self.show_images()
 
         self.view_frame.configure(
             label_text=f"{self.total_images} images were loaded")
@@ -835,3 +846,43 @@ class DownloadDialog(ctk.CTkToplevel):
         Close the dialog aka DESTROY!
         """
         self.destroy()
+
+
+class ImageViewWindow(ctk.CTkToplevel):
+    """ 
+    ### Image View Window
+    A toplevel window that will display the images
+    """
+
+    def __init__(self, master, image_links, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+
+        self.title("Image View")
+        self.geometry("800x600+10+10")
+        self.after(0, lambda: self.state("zoomed"))
+
+        self.mainframe = ctk.CTkScrollableFrame(self, )
+        self.mainframe.grid(row=0, column=0, sticky="news")
+
+        # * Making mainframe responsive
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+        self.showimages = Thread(target=self.grid_images, args=(image_links, 3))
+        # self.grid_images(images=image_links, column_size=3)
+        self.showimages.start()
+
+    def grid_images(self, images, column_size:int):
+        """ 
+        ### Places the images in a grid
+        """
+        row = 0
+        col = 0
+        for image in images:
+            if col == column_size:
+                row += 1
+                col = 1
+            else:
+                col += 1
+            
+            ImageBox(self.mainframe, image).grid(row=row, column=col, padx=5, pady=5)
