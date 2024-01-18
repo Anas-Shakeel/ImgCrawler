@@ -232,3 +232,15 @@ class Backend:
 
         # Call `Download Complete Callback` method
         download_complete_callback()
+
+    def download_thumbnail(self, thumb_url:str, thumb_name:str, save_path:str):
+        """ 
+        ### Download thumbnail
+        This method downloads the `thumb_url` with a `thumb_name` in a `save_path`.
+        """
+        if not path.isdir(save_path):
+            os.mkdir(save_path)
+        
+        raw_data = requests.get(thumb_url).content
+        with open(f"{save_path}\\{thumb_name}", "wb") as thumb:
+            thumb.write(raw_data)
