@@ -6,6 +6,7 @@ from customtkinter import filedialog
 from CTkToolTip import CTkToolTip
 from backend import Backend
 import json
+import os
 from os.path import normpath
 from threading import Thread, Event
 import requests
@@ -148,16 +149,6 @@ class App(ctk.CTk):
         # Root Bindings
         self.bind("<Control-Shift-l>", self.load_presaved_data)
         self.bind("<Control-Shift-L>", self.load_presaved_data)
-        self.bind("<Control-d>", self.debug_method)
-        self.bind("<Control-D>", self.debug_method)
-
-    def debug_method(self, event=None):
-        """ 
-        ### Debug method
-        Method which contains the code for debug purposes
-        """
-        image_links = [link['thumb_url'] for link in self.scraped_data]
-        self.image_view = ImageViewWindow(self, image_links)
 
     def load_presaved_data(self, _=None):
         """ 
@@ -324,11 +315,28 @@ class App(ctk.CTk):
         messagebox.showerror(
             "Downloading Failed", f"{error_message}")
 
+    def download_thumbnails(self, event):
+        """
+        ### Download Thumbnails
+        this method downloads the thumbnails in local storage for ease of access later
+        """
+        for image in self.scraped_data:
+            try:
+                self.backend.download_thumbnail(
+                    image['thumb_url'],
+                    os.path.basename(os.path.normpath(image['thumb_url'])),
+                    "thumbnails\\")
+
+            except Exception as e:
+                print(e)
+
+        messagebox.showinfo("Thumbnails Downloaded",
+                            "Thumbnails have been downloaded successfully.")
+
     def show_images(self):
         """ Start Image Displayer Thread """
         # Create a image event, to stop thread at will... :)
         self.show_image_event = Event()
-
         display_thread = Thread(
             target=self.show_images_in_background, args=(self.show_image_event, ))
         display_thread.start()
@@ -846,61 +854,3 @@ class DownloadDialog(ctk.CTkToplevel):
         Close the dialog aka DESTROY!
         """
         self.destroy()
-
-
-class ImageViewWindow(ctk.CTkToplevel):
-    """ 
-    ### Image View Window
-    A toplevel window that will display the images
-    """
-
-    def __init__(self, master, image_links, *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
-
-        self.title("Image View")
-        self.geometry("800x600+10+10")
-        self.after(0, lambda: self.state("zoomed"))
-
-        self.mainframe = ctk.CTkScrollableFrame(self, )
-        self.mainframe.grid(row=0, column=0, sticky="news")
-
-        # * Making mainframe responsive
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
-
-        self.column_size = 3
-        self.image_links = image_links
-
-        self.bind("<Configure>", self.on_size_changed)
-
-        self.showimages = Thread(target=self.grid_images, args=(
-            self.image_links, self.column_size))
-        self.showimages.start()
-
-    def on_size_changed(self, event):
-        """ 
-        ### On size changed
-        code to run everytime user resizes this window
-        """
-        new_width = event.width
-        self.column_size = max(1, new_width // 200)
-        self.grid_images()
-        
-    # TODO Create a thumbnail downloader
-    ...
-
-    def grid_images(self, images, column_size: int):
-        """ 
-        ### Places the images in a grid
-        """
-        row = 0
-        col = 0
-        for image in images:
-            if col == column_size:
-                row += 1
-                col = 1
-            else:
-                col += 1
-
-            ImageBox(self.mainframe, image).grid(
-                row=row, column=col, padx=5, pady=5)
