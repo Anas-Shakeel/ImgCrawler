@@ -868,11 +868,28 @@ class ImageViewWindow(ctk.CTkToplevel):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
-        self.showimages = Thread(target=self.grid_images, args=(image_links, 3))
-        # self.grid_images(images=image_links, column_size=3)
+        self.column_size = 3
+        self.image_links = image_links
+
+        self.bind("<Configure>", self.on_size_changed)
+
+        self.showimages = Thread(target=self.grid_images, args=(
+            self.image_links, self.column_size))
         self.showimages.start()
 
-    def grid_images(self, images, column_size:int):
+    def on_size_changed(self, event):
+        """ 
+        ### On size changed
+        code to run everytime user resizes this window
+        """
+        new_width = event.width
+        self.column_size = max(1, new_width // 200)
+        self.grid_images()
+        
+    # TODO Create a thumbnail downloader
+    ...
+
+    def grid_images(self, images, column_size: int):
         """ 
         ### Places the images in a grid
         """
@@ -884,5 +901,6 @@ class ImageViewWindow(ctk.CTkToplevel):
                 col = 1
             else:
                 col += 1
-            
-            ImageBox(self.mainframe, image).grid(row=row, column=col, padx=5, pady=5)
+
+            ImageBox(self.mainframe, image).grid(
+                row=row, column=col, padx=5, pady=5)
