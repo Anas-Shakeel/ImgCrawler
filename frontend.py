@@ -105,7 +105,7 @@ class App(ctk.CTk):
                        image_type="JPG", size="27.3 KB",
                        dimensions="600x500", uploaded="2 weeks ago",
                        uploader="Mike", views="17 views",
-                       likes="1",).grid(row=0, padx=5, pady=5, sticky="ew")
+                       likes="1",).grid(row=0, padx=5, pady=2, sticky="ew")
 
         # * Other inputs Frame
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
@@ -858,29 +858,55 @@ class ImageItemFrame(ctk.CTkFrame):
 
         # * Add thumbnail
         self.thumbnail = None
-        self.load_thumbnail(thumb_url)
+        self.load_thumbnail(thumb_url, size=80)
         ctk.CTkLabel(self, text="", image=self.thumbnail).grid(
             row=0, column=0, padx=5, pady=5, sticky="w")
 
         # * Create a description frame
         self.description_frame = ctk.CTkFrame(
-            self, height=90, corner_radius=0,)
+            self, height=80, corner_radius=0, fg_color="transparent")
         self.description_frame.grid(
             row=0, column=1, padx=5, pady=5, sticky="news")
         self.columnconfigure(1, weight=1)
+        self.description_frame.columnconfigure(0, weight=1)
+        self.description_frame.rowconfigure(0, weight=1)
+        self.description_frame.rowconfigure(1, weight=1)
 
         # Create a title
         ctk.CTkLabel(self.description_frame, text=title,
-                     font=("Inter Medium", 20),
-                     ).grid(row=0, column=0, padx=5, pady=5, sticky="wn")
+                     font=("Segoe UI bold", 20), anchor="sw",
+                     text_color="#d5d5d5",
+
+                     ).grid(row=0, column=0, padx=5, pady=5, sticky="news")
+
+        # Create details_frame
+        self.details_frame = ctk.CTkFrame(
+            self.description_frame, corner_radius=0)
+        self.details_frame.grid(row=1, column=0, padx=0, pady=2, sticky="wn")
+
+        # Add items in details_frame
+        items_values = {
+            "Type": f"{image_type} File",
+            "Size": size,
+            "Dimensions": dimensions,
+            "Uploaded": uploaded,
+            "Uploader": uploader,
+        }
+        for index, key_value in enumerate(items_values.items()):
+            ctk.CTkLabel(self.details_frame, text=f"{key_value[0]}: {key_value[1]}",
+                         font=("Segoe UI bold", 13), text_color="#b1b1b1",
+                         anchor="nw").grid(row=0, column=index,
+                                           padx=5, pady=1, sticky="nw")
 
         # * Create view_likes frame
         self.view_likes_frame = ctk.CTkFrame(
-            self, width=100, height=90, corner_radius=0,)
+            self, width=100, height=80, corner_radius=0,
+            fg_color="transparent",
+        )
         self.view_likes_frame.grid(
             row=0, column=2, padx=5, pady=5, sticky="ens")
 
-    def load_thumbnail(self, url):
+    def load_thumbnail(self, url, size=90):
         """ 
         ### Load thumbnail
         loads the thumbnail and stores a reference in `self.thumbnail`
@@ -889,9 +915,9 @@ class ImageItemFrame(ctk.CTkFrame):
             raw_data = requests.get(url).content
             image = Image.open(BytesIO(raw_data))
 
-            self.image = ctk.CTkImage(image, size=(180, 180))
+            self.image = ctk.CTkImage(image, size=(size, size))
         except Exception as e:
             print("Error ocurred: {}".format(e))
             # Load default image thumbnail
             self.thumbnail = ctk.CTkImage(Image.open(
-                "assets\\thumb_preview.jpg"), size=(90, 90))
+                "assets\\thumb_preview.jpg"), size=(80, 80))
