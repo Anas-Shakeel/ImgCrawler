@@ -147,18 +147,8 @@ class App(ctk.CTk):
         self.scraped_data = presaved_data
         self.update_properties()
 
-        self.textbox_log.write("[Info] Loading Json Data...\n")
-        self.textbox_log.write("[Info] Json Data Loaded\n")
-        self.textbox_log.write(
-            f"\n[Info] Total Images: {self.total_images}")
-        self.textbox_log.write(
-            f"\n[Info] Total Size of Images: {self.total_size}\n\n")
-        self.textbox_api_data.delete_everything()
-        self.textbox_api_data.write(f"Response from API:\n")
-        self.textbox_api_data.write(json.dumps(self.scraped_data, indent=4))
-
-        # ! Shows the loaded images :: CLEANUP AFTER DEBUGGING !
-        # self.show_images()
+        # Shows the loaded images
+        self.show_images()
 
         self.view_frame.configure(
             label_text=f"{self.total_images} images were loaded")
@@ -231,15 +221,6 @@ class App(ctk.CTk):
         # Save the response "class"ically :)
         self.scraped_data = result
         self.update_properties()
-        self.textbox_log.write(
-            f"\n[Info] Total Extracted Images: {self.total_images}")
-        self.textbox_log.write(
-            f"\n[Info] Total Size of Images: {self.total_size}\n")
-        self.textbox_log.write(f"\n[Success] Data Extracted.\n\n")
-
-        self.textbox_api_data.delete_everything()
-        self.textbox_api_data.write(f"Response from API:\n")
-        self.textbox_api_data.write(json.dumps(self.scraped_data, indent=4))
 
         # Show images in 'view_frame'
         self.show_images()
@@ -322,8 +303,13 @@ class App(ctk.CTk):
             # If event is set, stop immediately!
             if event.is_set():
                 break
-            ImageBox(self.view_frame,
-                     thumb_url=image['thumb_url'],).grid(row=0, column=index, padx=5)
+            ImageItemFrame(self.view_frame,
+                           title=image['title'],
+                           thumb_url=image['thumb_url'],
+                           image_type=image['image_type'], size=image['size'],
+                           dimensions=image['resolution'], uploaded=image['uploaded'],
+                           uploader=image['uploader'], views=image['views'],
+                           likes=image['likes'],).grid(row=index, padx=5, pady=2, sticky="ew")
 
     def cancel_scraping(self):
         """ Cancel/Terminate the scraping thread """
@@ -921,7 +907,7 @@ class ImageItemFrame(ctk.CTkFrame):
             raw_data = requests.get(url).content
             image = Image.open(BytesIO(raw_data))
 
-            self.image = ctk.CTkImage(image, size=(size, size))
+            self.thumbnail = ctk.CTkImage(image, size=(size, size))
         except Exception as e:
             print("Error ocurred: {}".format(e))
             # Load default image thumbnail
