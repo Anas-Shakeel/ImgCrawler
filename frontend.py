@@ -87,7 +87,7 @@ class App(ctk.CTk):
         self.view_frame = ctk.CTkScrollableFrame(self.mainframe,
                                                  label_text="Images",
                                                  label_font=("", 18),
-                                                 orientation="horizontal")
+                                                 orientation="vertical")
         self.view_frame.grid(row=1, column=0, sticky="new")
 
         # * DATA Frame
@@ -149,25 +149,6 @@ class App(ctk.CTk):
         # Root Bindings
         self.bind("<Control-Shift-l>", self.load_presaved_data)
         self.bind("<Control-Shift-L>", self.load_presaved_data)
-        self.bind("<Control-d>", self.debug)
-        self.bind("<Control-D>", self.debug)
-        
-    def debug(self, event=None):
-        # Create a toplevel for debugging
-        self.debug_window = ctk.CTkToplevel(self,)
-        self.after(0 , lambda: self.debug_window.state("zoomed"))
-        
-        self.mainframe = ctk.CTkScrollableFrame(self.debug_window,)
-        self.mainframe.grid(row=0, column=0, sticky="news")
-        
-        self.debug_window.columnconfigure(0, weight=1)
-        self.debug_window.rowconfigure(0, weight=1)
-        
-        # Do other stuff!!!
-        ImageItemFrame(self.mainframe, ).grid(row=0, column=0, sticky="ew")
-        
-        self.mainframe.columnconfigure(0, weight=1)
-        
 
     def load_presaved_data(self, _=None):
         """ 
@@ -881,7 +862,6 @@ class ImageItemFrame(ctk.CTkFrame):
     This custom widget will be a image item frame that will display the information
     about an image in a more UI friendly way.
     """
+
     def __init__(self, master, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        
-        ...
