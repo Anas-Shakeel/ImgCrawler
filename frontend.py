@@ -82,7 +82,7 @@ class App(ctk.CTk):
         # ? Padding childs
         for child in self.fields_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
-        
+
         # Scrape Progress bar
         self.scrape_progress_bar = ctk.CTkProgressBar(self.mainframe,
                                                       height=5,
@@ -96,6 +96,17 @@ class App(ctk.CTk):
                                                  orientation="vertical")
         self.view_frame.grid(row=2, column=0, padx=5, pady=5, sticky="nesw")
         self.mainframe.rowconfigure(2, weight=1)
+        self.view_frame.columnconfigure(0, weight=1)
+
+        # ! FOR DEBUGGING PURPOSES!!! Remove afterwards
+        ImageItemFrame(self.view_frame,
+                       title="This is the title of the image",
+                       thumb_url="assets\\thumb_preview.jpg",
+                       image_type="JPG", size="27.3 KB",
+                       dimensions="600x500", uploaded="2 weeks ago",
+                       uploader="Mike", views="17 views",
+                       likes="1",).grid(row=0, pady=5, sticky="ew")
+        # ImageItemFrame(self.view_frame,).grid(row=1, pady=5, sticky="ew")
 
         # * Other inputs Frame
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
@@ -112,7 +123,7 @@ class App(ctk.CTk):
                    message="Download the scraped data",)
 
         self.other_frame.columnconfigure((0, ), weight=1)
-        
+
         # ? Padding otherframe's childs
         for child in self.other_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
@@ -837,5 +848,13 @@ class ImageItemFrame(ctk.CTkFrame):
     about an image in a more UI friendly way.
     """
 
-    def __init__(self, master, *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
+    def __init__(self, master,
+                 title, thumb_url,
+                 image_type, size,
+                 dimensions, uploaded,
+                 uploader, views, likes,
+                 *args, **kwargs):
+
+        super().__init__(master, height=100, *args, **kwargs)
+
+        # * Creating UI
