@@ -100,13 +100,12 @@ class App(ctk.CTk):
 
         # ! FOR DEBUGGING PURPOSES!!! Remove afterwards
         ImageItemFrame(self.view_frame,
-                       title="This is the title of the image",
+                       title="Shelby Mustang: A Performance Marvel Michael Savage from New Canaan",
                        thumb_url="assets\\thumb_preview.jpg",
                        image_type="JPG", size="27.3 KB",
                        dimensions="600x500", uploaded="2 weeks ago",
                        uploader="Mike", views="17 views",
-                       likes="1",).grid(row=0, pady=5, sticky="ew")
-        # ImageItemFrame(self.view_frame,).grid(row=1, pady=5, sticky="ew")
+                       likes="1",).grid(row=0, padx=5, pady=5, sticky="ew")
 
         # * Other inputs Frame
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
@@ -864,7 +863,22 @@ class ImageItemFrame(ctk.CTkFrame):
             row=0, column=0, padx=5, pady=5, sticky="w")
 
         # * Create a description frame
-        ...
+        self.description_frame = ctk.CTkFrame(
+            self, height=90, corner_radius=0,)
+        self.description_frame.grid(
+            row=0, column=1, padx=5, pady=5, sticky="news")
+        self.columnconfigure(1, weight=1)
+
+        # Create a title
+        ctk.CTkLabel(self.description_frame, text=title,
+                     font=("Inter Medium", 20),
+                     ).grid(row=0, column=0, padx=5, pady=5, sticky="wn")
+
+        # * Create view_likes frame
+        self.view_likes_frame = ctk.CTkFrame(
+            self, width=100, height=90, corner_radius=0,)
+        self.view_likes_frame.grid(
+            row=0, column=2, padx=5, pady=5, sticky="ens")
 
     def load_thumbnail(self, url):
         """ 
