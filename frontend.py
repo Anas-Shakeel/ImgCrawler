@@ -45,7 +45,7 @@ class App(ctk.CTk):
 
         # * Fields Frame [will hold input fields]
         self.fields_frame = ctk.CTkFrame(self.mainframe)
-        self.fields_frame.grid(row=0, column=0, sticky="we")
+        self.fields_frame.grid(row=0, column=0, padx=5, pady=5, sticky="we")
         self.mainframe.columnconfigure((0,), weight=1)
 
         ctk.CTkLabel(self.fields_frame, font=("", 18), text="Target URL").grid(
@@ -82,35 +82,24 @@ class App(ctk.CTk):
         # ? Padding childs
         for child in self.fields_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
+        
+        # Scrape Progress bar
+        self.scrape_progress_bar = ctk.CTkProgressBar(self.mainframe,
+                                                      height=5,
+                                                      mode="indeterminate",
+                                                      corner_radius=2)
 
         # * View Frame
         self.view_frame = ctk.CTkScrollableFrame(self.mainframe,
                                                  label_text="Images",
                                                  label_font=("", 18),
                                                  orientation="vertical")
-        self.view_frame.grid(row=1, column=0, sticky="new")
-
-        # * DATA Frame
-        self.data_frame = ctk.CTkFrame(self.mainframe)
-        self.data_frame.grid(row=2, column=0, sticky="news")
+        self.view_frame.grid(row=2, column=0, padx=5, pady=5, sticky="nesw")
         self.mainframe.rowconfigure(2, weight=1)
-
-        self.textbox_log = TextBoxFrame(
-            self.data_frame, label="Log View", font=("", 18))
-        self.textbox_log.grid(row=0, column=0, sticky="nsew")
-
-        self.textbox_api_data = TextBoxFrame(
-            self.data_frame, label="API Data", font=("", 18))
-        self.textbox_api_data.grid(row=0, column=1, sticky="nsew")
-
-        # Making it Resizable
-        self.data_frame.columnconfigure(0, weight=1)
-        self.data_frame.columnconfigure(1, weight=1)
-        self.data_frame.rowconfigure(0, weight=1)
 
         # * Other inputs Frame
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
-        self.other_frame.grid(row=3, sticky="we")
+        self.other_frame.grid(row=3, padx=5, pady=5, sticky="wes")
 
         self.button_download_data = ctk.CTkButton(self.other_frame,
                                                   text="Download",
@@ -123,25 +112,10 @@ class App(ctk.CTk):
                    message="Download the scraped data",)
 
         self.other_frame.columnconfigure((0, ), weight=1)
-
-        # ? Padding mainframe's childs
-        for child in self.mainframe.winfo_children():
-            child.grid_configure(padx=5, pady=5)
-
+        
         # ? Padding otherframe's childs
         for child in self.other_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
-
-        # * Status bar
-        self.status_bar = ctk.CTkFrame(self, height=25)
-        self.status_bar.grid(sticky="ew")
-
-        # Scrape Progress bar
-        self.scrape_progress_bar = ctk.CTkProgressBar(self.status_bar,
-                                                      height=10,
-                                                      mode="indeterminate",
-                                                      corner_radius=2)
-        self.status_bar.columnconfigure(0, weight=1)
 
         # * Keyboard & Mouse Bindings (Shortcuts)
         # Shortcut Binding for entry url
@@ -219,7 +193,7 @@ class App(ctk.CTk):
 
         # Instantiate the progress bar
         self.scrape_progress_bar.grid(
-            row=0, column=0, padx=10, pady=5, sticky="ew")
+            row=1, column=0, padx=10, pady=0, sticky="ew")
         self.scrape_progress_bar.start()
 
         # Start scraping in new thread
