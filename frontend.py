@@ -98,15 +98,6 @@ class App(ctk.CTk):
         self.mainframe.rowconfigure(2, weight=1)
         self.view_frame.columnconfigure(0, weight=1)
 
-        # ! FOR DEBUGGING PURPOSES!!! Remove afterwards
-        ImageItemFrame(self.view_frame,
-                       title="Shelby Mustang: A Performance Marvel Michael Savage from New Canaan",
-                       thumb_url="assets\\thumb_preview.jpg",
-                       image_type="JPG", size="27.3 KB",
-                       dimensions="600x500", uploaded="2 weeks ago",
-                       uploader="Mike", views="984284",
-                       likes="1",).grid(row=0, padx=5, pady=2, sticky="ew")
-
         # * Other inputs Frame
         self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
         self.other_frame.grid(row=3, padx=5, pady=5, sticky="wes")
@@ -905,8 +896,7 @@ class ImageItemFrame(ctk.CTkFrame):
         )
         self.view_likes_frame.grid(
             row=0, column=2, padx=5, pady=5, sticky="ens")
-        self.view_likes_frame.rowconfigure((0, 1,), weight=1)
-        # self.view_likes_frame.rowconfigure(0, weight=1)
+        self.view_likes_frame.rowconfigure(0, weight=1)
 
         # Views label
         self.views_icon = ctk.CTkImage(
