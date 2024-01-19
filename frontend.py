@@ -857,4 +857,27 @@ class ImageItemFrame(ctk.CTkFrame):
 
         super().__init__(master, height=100, *args, **kwargs)
 
-        # * Creating UI
+        # * Add thumbnail
+        self.thumbnail = None
+        self.load_thumbnail(thumb_url)
+        ctk.CTkLabel(self, text="", image=self.thumbnail).grid(
+            row=0, column=0, padx=5, pady=5, sticky="w")
+
+        # * Create a description frame
+        ...
+
+    def load_thumbnail(self, url):
+        """ 
+        ### Load thumbnail
+        loads the thumbnail and stores a reference in `self.thumbnail`
+        """
+        try:
+            raw_data = requests.get(url).content
+            image = Image.open(BytesIO(raw_data))
+
+            self.image = ctk.CTkImage(image, size=(180, 180))
+        except Exception as e:
+            print("Error ocurred: {}".format(e))
+            # Load default image thumbnail
+            self.thumbnail = ctk.CTkImage(Image.open(
+                "assets\\thumb_preview.jpg"), size=(90, 90))
