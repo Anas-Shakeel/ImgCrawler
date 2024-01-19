@@ -299,6 +299,11 @@ class App(ctk.CTk):
 
     def show_images_in_background(self, event: Event):
         """ Displays images in `view_frame` in background """
+        # Clear the existing images first (if any)
+        for child in self.view_frame.winfo_children()[::-1]:
+            child.grid_forget()
+            child.destroy()
+        
         for index, image in enumerate(self.scraped_data):
             # If event is set, stop immediately!
             if event.is_set():
@@ -309,7 +314,7 @@ class App(ctk.CTk):
                            image_type=image['image_type'], size=image['size'],
                            dimensions=image['resolution'], uploaded=image['uploaded'],
                            uploader=image['uploader'], views=image['views'],
-                           likes=image['likes'],).grid(row=index, padx=5, pady=2, sticky="ew")
+                           likes=image['likes'],).grid(row=index, padx=10, pady=3, sticky="ew")
 
     def cancel_scraping(self):
         """ Cancel/Terminate the scraping thread """
@@ -894,7 +899,7 @@ class ImageItemFrame(ctk.CTkFrame):
         # Likes Label
         self.likes_icon = ctk.CTkImage(
             dark_image=Image.open("assets\\likes_light_16px.png"))
-        ctk.CTkLabel(self.view_likes_frame, text=f" {likes} ", image=self.likes_icon,
+        ctk.CTkLabel(self.view_likes_frame, text=f" {likes} likes ", image=self.likes_icon,
                      font=("Segoe UI bold", 15), text_color="#b5b5b5", compound="right",
                      anchor="n").grid(row=1, padx=5, pady=5, sticky="e")
 
@@ -909,7 +914,7 @@ class ImageItemFrame(ctk.CTkFrame):
 
             self.thumbnail = ctk.CTkImage(image, size=(size, size))
         except Exception as e:
-            print("Error ocurred: {}".format(e))
+            print("Thumbnail not found: {}".format(e))
             # Load default image thumbnail
             self.thumbnail = ctk.CTkImage(Image.open(
                 "assets\\thumb_preview.jpg"), size=(80, 80))
