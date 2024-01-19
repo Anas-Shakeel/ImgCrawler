@@ -104,7 +104,7 @@ class App(ctk.CTk):
                        thumb_url="assets\\thumb_preview.jpg",
                        image_type="JPG", size="27.3 KB",
                        dimensions="600x500", uploaded="2 weeks ago",
-                       uploader="Mike", views="17 views",
+                       uploader="Mike", views="984284",
                        likes="1",).grid(row=0, padx=5, pady=2, sticky="ew")
 
         # * Other inputs Frame
@@ -900,11 +900,27 @@ class ImageItemFrame(ctk.CTkFrame):
 
         # * Create view_likes frame
         self.view_likes_frame = ctk.CTkFrame(
-            self, width=100, height=80, corner_radius=0,
+            self, height=80, corner_radius=0,
             fg_color="transparent",
         )
         self.view_likes_frame.grid(
             row=0, column=2, padx=5, pady=5, sticky="ens")
+        self.view_likes_frame.rowconfigure((0, 1,), weight=1)
+        # self.view_likes_frame.rowconfigure(0, weight=1)
+
+        # Views label
+        self.views_icon = ctk.CTkImage(
+            dark_image=Image.open("assets\\views_light_16px.png"))
+        ctk.CTkLabel(self.view_likes_frame, text=f"{views} ", image=self.views_icon,
+                     font=("Segoe UI bold", 15), text_color="#b5b5b5", compound="right",
+                     anchor="s").grid(row=0, padx=5, pady=5, sticky="e")
+
+        # Likes Label
+        self.likes_icon = ctk.CTkImage(
+            dark_image=Image.open("assets\\likes_light_16px.png"))
+        ctk.CTkLabel(self.view_likes_frame, text=f" {likes} ", image=self.likes_icon,
+                     font=("Segoe UI bold", 15), text_color="#b5b5b5", compound="right",
+                     anchor="n").grid(row=1, padx=5, pady=5, sticky="e")
 
     def load_thumbnail(self, url, size=90):
         """ 
