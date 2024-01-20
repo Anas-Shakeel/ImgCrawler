@@ -72,6 +72,9 @@ class App(ctk.CTk):
                                       border_width=1, border_color="#404040",
                                       placeholder_text="Enter Album URL Here...")
         self.entry_url.grid(row=0, column=1, sticky="we")
+        # Focus on entry url
+        self.entry_url.after(1000, self.entry_url.lift)
+        self.entry_url.after(1000, self.entry_url.focus_force)
         # Tooltip for entry url
         CTkToolTip(self.entry_url,
                    follow=False, delay=0.5,
@@ -372,19 +375,19 @@ class App(ctk.CTk):
     def download(self):
         """ Download the images """
         # Scrape Validation
-        # if not self.scraped_data:
-        # Haven't Scraped anything yet!
-        # messagebox.showinfo("No Data to Download",
-        # "There is no data to download, Please scrape the data first!")
-        # self.entry_url.focus()
-        # return
+        if not self.scraped_data:
+            # Haven't Scraped anything yet!
+            messagebox.showinfo("No Data to Download",
+                                "There is no data to download, Please scrape the data first!")
+            self.entry_url.focus()
+            return
 
         # * Show Download Dialog
         self.download_dialog = DownloadDialog(self,
                                               self.image_downloader,
                                               self.text_downloader)
-        self.download_dialog.after(100, self.download_dialog.lift)
-        self.download_dialog.after(100, self.download_dialog.focus_force)
+        # Give the focus to download dialog
+        self.download_dialog.get_focus_force(200)
 
     def image_downloader(self, save_path, image_quality,  step_callback):
         """
@@ -599,7 +602,7 @@ class DirectoryField(ctk.CTkFrame):
 
         except Exception as e:
             print(f"error: {e}")
-        
+
         finally:
             # Giving focus back to parent
             master.after(5, master.lift)
@@ -821,6 +824,7 @@ class DownloadDialog(ctk.CTkToplevel):
             if not filename_:
                 messagebox.showerror("Invalid Filename",
                                      "Filename not found.\nPlease enter a filename for your file.")
+                self.get_focus_force(0)
                 return
 
         # * Get Save Path
@@ -828,6 +832,7 @@ class DownloadDialog(ctk.CTkToplevel):
         if not directory_:
             messagebox.showerror(
                 "Invalid Directory", "Directory not found.\nPlease enter a folder to save your data.")
+            self.get_focus_force(0)
             return
 
         # Initiate Download
@@ -845,6 +850,14 @@ class DownloadDialog(ctk.CTkToplevel):
         """
         # Increase the Progress
         self._progress_bar['value'] += round((1/tasks_)*100, 5)
+
+    def get_focus_force(self, after: int):
+        """ 
+        ### Get Focus Force
+        `DownloadDialog` gets focus forcefully after `after` milliseconds.
+        """
+        self.after(after, self.lift)
+        self.after(after, self.focus_force)
 
     def close_dialog(self):
         """
