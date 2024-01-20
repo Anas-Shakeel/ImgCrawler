@@ -383,6 +383,8 @@ class App(ctk.CTk):
         self.download_dialog = DownloadDialog(self,
                                               self.image_downloader,
                                               self.text_downloader)
+        self.download_dialog.after(100, self.download_dialog.lift)
+        self.download_dialog.after(100, self.download_dialog.focus_force)
 
     def image_downloader(self, save_path, image_quality,  step_callback):
         """
@@ -543,13 +545,18 @@ class DirectoryField(ctk.CTkFrame):
     """
 
     def __init__(self, master, *args, **kwargs):
-        super().__init__(master, height=50, *args, **kwargs)
+        super().__init__(master, height=50, fg_color="transparent", *args, **kwargs)
 
         # Entry field
         self.dir_var = ""
         self.entry_field = ctk.CTkEntry(self,
                                         placeholder_text="Enter save location",
-                                        font=("", 16))
+                                        font=("Segoe UI", 16),
+                                        text_color="#bbb",
+                                        fg_color="#292929",
+                                        corner_radius=5,
+                                        border_width=1, border_color="#404040",
+                                        )
         self.entry_field.grid(row=0, column=0, sticky="ew")
         # Tooltip for Directory Field
         CTkToolTip(self.entry_field,
@@ -559,8 +566,13 @@ class DirectoryField(ctk.CTkFrame):
         # Open File Dialog Button
         self.image = ctk.CTkImage(
             dark_image=Image.open("assets\\directory_light_16px.png"))
-        self.dir_button = ctk.CTkButton(
-            self, text="", image=self.image, width=30, height=30, command=self.open_dialog)
+        self.dir_button = ctk.CTkButton(self, text="", image=self.image,
+                                        width=30, height=30,
+                                        fg_color="#404040",
+                                        border_width=1,
+                                        border_color="#505050",
+                                        hover_color="#046DB9",
+                                        command=lambda: self.open_dialog(master))
         self.dir_button.grid(row=0, column=1, sticky="e")
         # Tooltip for Dir Button
         CTkToolTip(self.dir_button,
@@ -573,7 +585,7 @@ class DirectoryField(ctk.CTkFrame):
         for child in self.winfo_children():
             child.grid_configure(padx=2, pady=1)
 
-    def open_dialog(self):
+    def open_dialog(self, master):
         """
         ### Open Directory Dialog
         Opens a directory dialog and returns the user's selected dir.
@@ -587,6 +599,11 @@ class DirectoryField(ctk.CTkFrame):
 
         except Exception as e:
             print(f"error: {e}")
+        
+        finally:
+            # Giving focus back to parent
+            master.after(5, master.lift)
+            master.after(5, master.focus_force)
 
     def get_dir(self):
         """
@@ -612,7 +629,7 @@ class DownloadDialog(ctk.CTkToplevel):
         BG_COLOR = "#1f1f1f"
         BORDER_COLOR = "#404040"
         FIELD_COLOR = "#353535"
-        FIELD_HOVER_COLOR = "#202020"
+        FIELD_HOVER_COLOR = "#046DB9"
         PRIMARY_COLOR = "#046DB9"
 
         self.image_downloader = image_downlod_callback
@@ -622,7 +639,7 @@ class DownloadDialog(ctk.CTkToplevel):
         self.title("Download")
         self.place_in_center(520, 140)
         self.resizable(False, False)
-        self.grab_set()
+        # self.grab_set()
 
         # * Mainframe
         self._mainframe = ctk.CTkFrame(self, border_width=1,
