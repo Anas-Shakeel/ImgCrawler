@@ -5,7 +5,6 @@ from tkinter import messagebox
 from customtkinter import filedialog
 from CTkToolTip import CTkToolTip
 from backend import Backend
-import json
 import os
 from os.path import normpath
 from threading import Thread, Event
@@ -21,8 +20,17 @@ class App(ctk.CTk):
     PROGRAM_VER = "1.0"
 
     def __init__(self):
-        super().__init__()
+        super().__init__(fg_color="#1F1F1F")
         self.backend = Backend()
+
+        # * Colors & Fonts
+        self.font_ = "Segoe UI"
+
+        fg = "#292929"
+        bg = "#1F1F1F"
+        title_color = "#999999"
+        border_color = "#353535"
+        primary_color = "#fe771d"
 
         # * Will hold All scraped data
         self.scraped_data = None
@@ -38,22 +46,30 @@ class App(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self.exit_app)
 
         # * Mainframe [to hold everything]
-        self.mainframe = ctk.CTkFrame(self)
+        self.mainframe = ctk.CTkFrame(self, fg_color=bg)
         self.mainframe.grid(sticky="news", padx=10, pady=10)
         self.columnconfigure((0,), weight=1)
         self.rowconfigure((0,), weight=1)
 
         # * Fields Frame [will hold input fields]
-        self.fields_frame = ctk.CTkFrame(self.mainframe)
-        self.fields_frame.grid(row=0, column=0, sticky="we")
+        self.fields_frame = ctk.CTkFrame(self.mainframe,
+                                         border_width=1,
+                                         border_color=border_color,
+                                         fg_color=fg,
+                                         corner_radius=2,
+                                         )
+        self.fields_frame.grid(row=0, column=0, padx=5, pady=5, sticky="we")
         self.mainframe.columnconfigure((0,), weight=1)
 
-        ctk.CTkLabel(self.fields_frame, font=("", 18), text="Target URL").grid(
+        ctk.CTkLabel(self.fields_frame, font=(f"{self.font_} bold", 20), text_color=title_color, text="Target URL").grid(
             row=0, column=0)
 
         self.entry_url = ctk.CTkEntry(self.fields_frame,
-                                      height=35, font=("", 18),
-                                      text_color=("green", "#A6A6A6"),
+                                      height=35, font=(self.font_, 18),
+                                      text_color=title_color,
+                                      fg_color=fg,
+                                      corner_radius=3,
+                                      border_width=1, border_color="#404040",
                                       placeholder_text="Enter Album URL Here...")
         self.entry_url.grid(row=0, column=1, sticky="we")
         # Tooltip for entry url
@@ -63,16 +79,33 @@ class App(ctk.CTk):
 
         self.fields_frame.columnconfigure(1, weight=1)
 
-        self.button_scrape = ctk.CTkButton(
-            self.fields_frame, text="Scrape", width=90, height=35, command=self.start_scraping)
+        self.button_scrape = ctk.CTkButton(self.fields_frame,
+                                           text="Scrape",
+                                           width=90, height=35,
+                                           corner_radius=4,
+                                           font=(f"{self.font_} bold", 16),
+                                           text_color="#c8c8c8",
+                                           hover_color="#0E4F81",
+                                           fg_color="#046DB9",
+                                           command=self.start_scraping)
         self.button_scrape.grid(row=0, column=2)
         # Tooltip for button
         CTkToolTip(self.button_scrape,
                    follow=False, delay=0.5,
                    message="Scrape the url",)
 
-        self.button_scrape_cancel = ctk.CTkButton(
-            self.fields_frame, text="Cancel", width=90, height=35, command=self.cancel_scraping)
+        self.button_scrape_cancel = ctk.CTkButton(self.fields_frame,
+                                                  text="Cancel",
+                                                  width=90, height=35,
+                                                  corner_radius=4,
+                                                  font=(
+                                                      f"{self.font_} bold", 15),
+                                                  text_color="#c8c8c8",
+                                                  border_width=1,
+                                                  border_color="#404040",
+                                                  hover_color="#7C0902",
+                                                  fg_color="#353535",
+                                                  command=self.cancel_scraping)
         self.button_scrape_cancel.grid(row=0, column=3)
         # Tooltip for button
         CTkToolTip(self.button_scrape_cancel,
@@ -83,38 +116,44 @@ class App(ctk.CTk):
         for child in self.fields_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
 
+        # Scrape Progress bar
+        self.scrape_progress_bar = ctk.CTkProgressBar(self.mainframe,
+                                                      height=5,
+                                                      mode="indeterminate",
+                                                      corner_radius=2)
+
         # * View Frame
-        self.view_frame = ctk.CTkScrollableFrame(self.mainframe,
+        self.view_frame = ctk.CTkScrollableFrame(self.mainframe, fg_color=fg,
                                                  label_text="Images",
-                                                 label_font=("", 18),
+                                                 label_text_color=title_color,
+                                                 label_fg_color="#353535",
+                                                 border_width=1,
+                                                 border_color="#404040",
+                                                 label_font=(
+                                                     f"{self.font_} bold", 18),
+                                                 scrollbar_button_color="#353535",
+                                                 scrollbar_button_hover_color="#505050",
                                                  orientation="vertical")
-        self.view_frame.grid(row=1, column=0, sticky="new")
-
-        # * DATA Frame
-        self.data_frame = ctk.CTkFrame(self.mainframe)
-        self.data_frame.grid(row=2, column=0, sticky="news")
+        self.view_frame.grid(row=2, column=0, padx=5, pady=5, sticky="nesw")
         self.mainframe.rowconfigure(2, weight=1)
-
-        self.textbox_log = TextBoxFrame(
-            self.data_frame, label="Log View", font=("", 18))
-        self.textbox_log.grid(row=0, column=0, sticky="nsew")
-
-        self.textbox_api_data = TextBoxFrame(
-            self.data_frame, label="API Data", font=("", 18))
-        self.textbox_api_data.grid(row=0, column=1, sticky="nsew")
-
-        # Making it Resizable
-        self.data_frame.columnconfigure(0, weight=1)
-        self.data_frame.columnconfigure(1, weight=1)
-        self.data_frame.rowconfigure(0, weight=1)
+        self.view_frame.columnconfigure(0, weight=1)
 
         # * Other inputs Frame
-        self.other_frame = ctk.CTkFrame(self.mainframe, height=50)
-        self.other_frame.grid(row=3, sticky="we")
+        self.other_frame = ctk.CTkFrame(
+            self.mainframe, border_width=1, border_color=border_color, fg_color=fg, height=50)
+        self.other_frame.grid(row=3, padx=5, pady=5, sticky="wes")
 
         self.button_download_data = ctk.CTkButton(self.other_frame,
                                                   text="Download",
-                                                  width=90, height=35,
+                                                  width=95, height=35,
+                                                  corner_radius=4,
+                                                  font=(
+                                                      f"{self.font_} bold", 16),
+                                                  text_color="#c8c8c8",
+                                                  border_width=1,
+                                                  border_color="#404040",
+                                                  hover_color="#046DB9",
+                                                  fg_color="#353535",
                                                   command=self.download)
         self.button_download_data.grid(row=0, column=0, sticky="e")
         # Tooltip for button
@@ -124,24 +163,9 @@ class App(ctk.CTk):
 
         self.other_frame.columnconfigure((0, ), weight=1)
 
-        # ? Padding mainframe's childs
-        for child in self.mainframe.winfo_children():
-            child.grid_configure(padx=5, pady=5)
-
         # ? Padding otherframe's childs
         for child in self.other_frame.winfo_children():
             child.grid_configure(padx=10, pady=10)
-
-        # * Status bar
-        self.status_bar = ctk.CTkFrame(self, height=25)
-        self.status_bar.grid(sticky="ew")
-
-        # Scrape Progress bar
-        self.scrape_progress_bar = ctk.CTkProgressBar(self.status_bar,
-                                                      height=10,
-                                                      mode="indeterminate",
-                                                      corner_radius=2)
-        self.status_bar.columnconfigure(0, weight=1)
 
         # * Keyboard & Mouse Bindings (Shortcuts)
         # Shortcut Binding for entry url
@@ -172,18 +196,8 @@ class App(ctk.CTk):
         self.scraped_data = presaved_data
         self.update_properties()
 
-        self.textbox_log.write("[Info] Loading Json Data...\n")
-        self.textbox_log.write("[Info] Json Data Loaded\n")
-        self.textbox_log.write(
-            f"\n[Info] Total Images: {self.total_images}")
-        self.textbox_log.write(
-            f"\n[Info] Total Size of Images: {self.total_size}\n\n")
-        self.textbox_api_data.delete_everything()
-        self.textbox_api_data.write(f"Response from API:\n")
-        self.textbox_api_data.write(json.dumps(self.scraped_data, indent=4))
-
-        # ! Shows the loaded images :: CLEANUP AFTER DEBUGGING !
-        # self.show_images()
+        # Shows the loaded images
+        self.show_images()
 
         self.view_frame.configure(
             label_text=f"{self.total_images} images were loaded")
@@ -219,7 +233,7 @@ class App(ctk.CTk):
 
         # Instantiate the progress bar
         self.scrape_progress_bar.grid(
-            row=0, column=0, padx=10, pady=5, sticky="ew")
+            row=1, column=0, padx=10, pady=0, sticky="ew")
         self.scrape_progress_bar.start()
 
         # Start scraping in new thread
@@ -256,15 +270,6 @@ class App(ctk.CTk):
         # Save the response "class"ically :)
         self.scraped_data = result
         self.update_properties()
-        self.textbox_log.write(
-            f"\n[Info] Total Extracted Images: {self.total_images}")
-        self.textbox_log.write(
-            f"\n[Info] Total Size of Images: {self.total_size}\n")
-        self.textbox_log.write(f"\n[Success] Data Extracted.\n\n")
-
-        self.textbox_api_data.delete_everything()
-        self.textbox_api_data.write(f"Response from API:\n")
-        self.textbox_api_data.write(json.dumps(self.scraped_data, indent=4))
 
         # Show images in 'view_frame'
         self.show_images()
@@ -343,12 +348,22 @@ class App(ctk.CTk):
 
     def show_images_in_background(self, event: Event):
         """ Displays images in `view_frame` in background """
+        # Clear the existing images first (if any)
+        for child in self.view_frame.winfo_children()[::-1]:
+            child.grid_forget()
+            child.destroy()
+
         for index, image in enumerate(self.scraped_data):
             # If event is set, stop immediately!
             if event.is_set():
                 break
-            ImageBox(self.view_frame,
-                     thumb_url=image['thumb_url'],).grid(row=0, column=index, padx=5)
+            ImageItemFrame(self.view_frame,
+                           title=image['title'],
+                           thumb_url=image['thumb_url'],
+                           image_type=image['image_type'], size=image['size'],
+                           dimensions=image['resolution'], uploaded=image['uploaded'],
+                           uploader=image['uploader'], views=image['views'],
+                           likes=image['likes'],).grid(row=index, padx=10, pady=3, sticky="ew")
 
     def cancel_scraping(self):
         """ Cancel/Terminate the scraping thread """
@@ -442,13 +457,6 @@ class App(ctk.CTk):
 
         except Exception as error:
             self.handle_download_errors(error)
-
-    def show_popup(self, message):
-        """
-        ### Show Popup
-        Shows a popup dialog displaying `message`
-        """
-        PopupDialog(self, message)
 
     def place_in_center(self, width, height):
         """ Places `self` in the center of the screen """
@@ -586,82 +594,6 @@ class DirectoryField(ctk.CTkFrame):
         Returns the directory entered in the directory field
         """
         return self.entry_field.get()
-
-
-class TextBoxFrame(ctk.CTkFrame):
-    """
-    ### TextBox Frame
-    A Custom-Widget used to create a textbox frame
-    """
-
-    def __init__(self, master, width=200, label="TextBoxFrame", font=None, *args, **kwargs):
-        super().__init__(master, width, bg_color="transparent",  *args, **kwargs)
-
-        ctk.CTkLabel(self, text=label, font=("", 18),
-                     height=10,
-                     fg_color="#393939",
-                     corner_radius=4,
-                     ).grid(row=0, column=0, columnspan=2, ipadx=5, ipady=5, padx=5, pady=2, sticky="ew")
-
-        self.text_area = ctk.CTkTextbox(self, font=font, state="disabled")
-        self.text_area.grid(row=1, column=0, columnspan=2,
-                            sticky="news", padx=5, pady=2)
-
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
-        self.rowconfigure(1, weight=1)
-
-    def write(self, data):
-        """
-        ### Write
-        Write `data` into the textbox of this widget.
-        """
-        self.text_area.configure(state="normal")
-        self.text_area.insert(ctk.END, data)
-        self.text_area.configure(state="disabled")
-
-    def delete_everything(self):
-        """
-        ### Delete Everything
-        Clears the text in the textbox of this widget.
-        """
-        self.text_area.configure(state=tk.NORMAL)
-        self.text_area.delete("1.0", "end")
-        self.text_area.configure(state=tk.DISABLED)
-
-
-class PopupDialog(ctk.CTkToplevel):
-    def __init__(self, parent, message):
-        super().__init__(parent)
-
-        self.overrideredirect(1)
-        self.place_in_center(300, 150)
-
-        # Set up widgets
-        self.message_label = ctk.CTkLabel(self, text=message, padx=20, pady=20)
-        self.ok_button = ctk.CTkButton(
-            self, text="OK", font=("", 18), command=self.on_ok)
-
-        # Pack widgets
-        self.message_label.pack()
-        self.ok_button.pack(pady=10)
-
-        # Make the dialog modal
-        self.transient(parent)
-        # ! uncomment this: > to prevent interactions between user and other widgets
-        # self.grab_set()
-        parent.wait_window(self)
-
-    def place_in_center(self, width, height):
-        ''' Places `self` in the center of the screen '''
-        x = self.winfo_screenwidth() // 2 - width // 2
-        y = self.winfo_screenheight() // 2 - height // 2
-
-        geo_string = f"{width}x{height}+{x}+{y}"
-        self.geometry(geo_string)
-
-    def on_ok(self):
-        self.destroy()
 
 
 class DownloadDialog(ctk.CTkToplevel):
@@ -863,5 +795,99 @@ class ImageItemFrame(ctk.CTkFrame):
     about an image in a more UI friendly way.
     """
 
-    def __init__(self, master, *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
+    def __init__(self, master,
+                 title, thumb_url,
+                 image_type, size,
+                 dimensions, uploaded,
+                 uploader, views, likes,
+                 *args, **kwargs):
+
+        super().__init__(master, height=100,
+                         corner_radius=5,
+                         border_width=1, fg_color="#353535",
+                         *args, **kwargs)
+
+        # Colors
+        title_color = "#bbbbbb"
+        details_color = "#999999"
+
+        # * Add thumbnail
+        self.thumbnail = None
+        self.load_thumbnail(thumb_url, size=80)
+        ctk.CTkLabel(self, text="", image=self.thumbnail).grid(
+            row=0, column=0, padx=5, pady=5, sticky="w")
+
+        # * Create a description frame
+        self.description_frame = ctk.CTkFrame(
+            self, height=80, corner_radius=0, fg_color="transparent")
+        self.description_frame.grid(
+            row=0, column=1, padx=5, pady=5, sticky="news")
+        self.columnconfigure(1, weight=1)
+        self.description_frame.columnconfigure(0, weight=1)
+        self.description_frame.rowconfigure(0, weight=1)
+        self.description_frame.rowconfigure(1, weight=1)
+
+        # Create a title
+        ctk.CTkLabel(self.description_frame, text=title,
+                     font=("Segoe UI bold", 20), anchor="sw",
+                     text_color=title_color,
+
+                     ).grid(row=0, column=0, padx=5, pady=5, sticky="news")
+
+        # Create details_frame
+        self.details_frame = ctk.CTkFrame(
+            self.description_frame, fg_color="transparent", corner_radius=0)
+        self.details_frame.grid(row=1, column=0, padx=0, pady=2, sticky="wn")
+
+        # Add items in details_frame
+        items_values = {
+            "Type": f"{image_type} File",
+            "Size": size,
+            "Dimensions": dimensions,
+            "Uploaded": uploaded,
+            "Uploader": uploader,
+        }
+        for index, key_value in enumerate(items_values.items()):
+            ctk.CTkLabel(self.details_frame, text=f"{key_value[0]}: {key_value[1]}",
+                         font=("Segoe UI bold", 13), text_color=details_color,
+                         anchor="nw").grid(row=0, column=index,
+                                           padx=5, pady=1, sticky="nw")
+
+        # * Create view_likes frame
+        self.view_likes_frame = ctk.CTkFrame(
+            self, height=80, corner_radius=0,
+            fg_color="transparent",
+        )
+        self.view_likes_frame.grid(
+            row=0, column=2, padx=5, pady=5, sticky="ens")
+        self.view_likes_frame.rowconfigure(0, weight=1)
+
+        # Views label
+        self.views_icon = ctk.CTkImage(
+            dark_image=Image.open("assets\\views_light_16px.png"))
+        ctk.CTkLabel(self.view_likes_frame, text=f"{views} ", image=self.views_icon,
+                     font=("Segoe UI bold", 15), text_color=details_color, compound="right",
+                     anchor="s").grid(row=0, padx=5, pady=5, sticky="e")
+
+        # Likes Label
+        self.likes_icon = ctk.CTkImage(
+            dark_image=Image.open("assets\\likes_light_16px.png"))
+        ctk.CTkLabel(self.view_likes_frame, text=f" {likes} likes ", image=self.likes_icon,
+                     font=("Segoe UI bold", 15), text_color=details_color, compound="right",
+                     anchor="n").grid(row=1, padx=5, pady=5, sticky="e")
+
+    def load_thumbnail(self, url, size=90):
+        """ 
+        ### Load thumbnail
+        loads the thumbnail and stores a reference in `self.thumbnail`
+        """
+        try:
+            raw_data = requests.get(url).content
+            image = Image.open(BytesIO(raw_data))
+
+            self.thumbnail = ctk.CTkImage(image, size=(size, size))
+        except Exception as e:
+            print("Thumbnail not found: {}".format(e))
+            # Load default image thumbnail
+            self.thumbnail = ctk.CTkImage(Image.open(
+                "assets\\thumb_preview.jpg"), size=(80, 80))
