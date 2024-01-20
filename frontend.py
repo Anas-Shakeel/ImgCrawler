@@ -372,12 +372,12 @@ class App(ctk.CTk):
     def download(self):
         """ Download the images """
         # Scrape Validation
-        if not self.scraped_data:
-            # Haven't Scraped anything yet!
-            messagebox.showinfo("No Data to Download",
-                                "There is no data to download, Please scrape the data first!")
-            self.entry_url.focus()
-            return
+        # if not self.scraped_data:
+        # Haven't Scraped anything yet!
+        # messagebox.showinfo("No Data to Download",
+        # "There is no data to download, Please scrape the data first!")
+        # self.entry_url.focus()
+        # return
 
         # * Show Download Dialog
         self.download_dialog = DownloadDialog(self,
@@ -603,7 +603,17 @@ class DownloadDialog(ctk.CTkToplevel):
     """
 
     def __init__(self, master, image_downlod_callback, text_download_callback, *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
+        super().__init__(master, fg_color="#1f1f1f", *args, **kwargs)
+
+        # * Colors & Fonts
+        FONT = "Segoe UI"
+        TEXT_COLOR = "#bbbbbb"
+        FG_COLOR = "#292929"
+        BG_COLOR = "#1f1f1f"
+        BORDER_COLOR = "#404040"
+        FIELD_COLOR = "#353535"
+        FIELD_HOVER_COLOR = "#202020"
+        PRIMARY_COLOR = "#046DB9"
 
         self.image_downloader = image_downlod_callback
         self.text_downloader = text_download_callback
@@ -615,14 +625,15 @@ class DownloadDialog(ctk.CTkToplevel):
         self.grab_set()
 
         # * Mainframe
-        self._mainframe = ctk.CTkFrame(self, )
+        self._mainframe = ctk.CTkFrame(self, border_width=1,
+                                       border_color=BORDER_COLOR)
         self._mainframe.grid(row=0, column=0, padx=5, pady=5, sticky="news")
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
         # * DATATYPE Label
-        ctk.CTkLabel(self._mainframe, text="Data Format", font=("", 15),
-                     ).grid(row=0, column=0, sticky="w", padx=10, pady=10)
+        ctk.CTkLabel(self._mainframe, text="Data Format", font=(f"{FONT} semibold", 16),
+                     text_color=TEXT_COLOR,).grid(row=0, column=0, sticky="w", padx=10, pady=10)
 
         # * DATATYPES Options Dropdown
         self._options_var = ctk.StringVar(value="IMAGE")
@@ -630,6 +641,15 @@ class DownloadDialog(ctk.CTkToplevel):
                                                width=120, height=30,
                                                variable=self._options_var,
                                                values=["JSON", "CSV", "IMAGE"],
+                                               fg_color=FIELD_COLOR,
+                                               corner_radius=5,
+                                               button_color="#404040",
+                                               button_hover_color=FIELD_HOVER_COLOR,
+                                               dropdown_hover_color=PRIMARY_COLOR,
+                                               font=(f"{FONT} semibold", 12),
+                                               dropdown_font=(
+                                                   f"{FONT} semibold", 11),
+                                               text_color=TEXT_COLOR,
                                                command=self.on_options_changed_datatype
                                                )
         self._options_menu.grid(row=0, column=1, sticky="w", padx=10, pady=10)
@@ -652,6 +672,16 @@ class DownloadDialog(ctk.CTkToplevel):
                                                   width=120, height=30,
                                                   values=[
                                                       "High Quality", "Low Quality"],
+                                                  fg_color=FIELD_COLOR,
+                                                  corner_radius=5,
+                                                  button_color="#404040",
+                                                  button_hover_color=FIELD_HOVER_COLOR,
+                                                  dropdown_hover_color=PRIMARY_COLOR,
+                                                  font=(
+                                                      f"{FONT} semibold", 12),
+                                                  dropdown_font=(
+                                                      f"{FONT} semibold", 11),
+                                                  text_color=TEXT_COLOR,
                                                   )
         self._options_quality.grid(
             row=0, column=2, sticky="w", padx=10, pady=10)
@@ -664,6 +694,11 @@ class DownloadDialog(ctk.CTkToplevel):
         self._button_download = ctk.CTkButton(self._mainframe,
                                               width=120, height=30,
                                               text="Download",
+                                              corner_radius=4,
+                                              font=(f"{FONT} bold", 14),
+                                              text_color=TEXT_COLOR,
+                                              hover_color="#0E4F81",
+                                              fg_color="#046DB9",
                                               command=self.start_download)
         self._button_download.grid(
             row=0, column=3, sticky="e", padx=10, pady=10)
