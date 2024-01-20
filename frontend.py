@@ -646,9 +646,9 @@ class DownloadDialog(ctk.CTkToplevel):
                                                button_color="#404040",
                                                button_hover_color=FIELD_HOVER_COLOR,
                                                dropdown_hover_color=PRIMARY_COLOR,
-                                               font=(f"{FONT} semibold", 12),
+                                               font=(f"{FONT}", 13),
                                                dropdown_font=(
-                                                   f"{FONT} semibold", 11),
+                                                   f"{FONT}", 12),
                                                text_color=TEXT_COLOR,
                                                command=self.on_options_changed_datatype
                                                )
@@ -660,8 +660,14 @@ class DownloadDialog(ctk.CTkToplevel):
 
         # * Filename Entry
         self._entry_filename = ctk.CTkEntry(self._mainframe,
-                                            placeholder_text="Filename", font=("", 16),
-                                            width=120, height=30)
+                                            placeholder_text="Filename",
+                                            width=120, height=30,
+                                            font=(FONT, 16),
+                                            text_color=TEXT_COLOR,
+                                            fg_color=FG_COLOR,
+                                            corner_radius=3,
+                                            border_width=1,
+                                            border_color=BORDER_COLOR)
         # Tooltip for Entry filename
         CTkToolTip(self._entry_filename,
                    follow=False, delay=0.5,
@@ -678,9 +684,9 @@ class DownloadDialog(ctk.CTkToplevel):
                                                   button_hover_color=FIELD_HOVER_COLOR,
                                                   dropdown_hover_color=PRIMARY_COLOR,
                                                   font=(
-                                                      f"{FONT} semibold", 12),
+                                                      f"{FONT}", 13),
                                                   dropdown_font=(
-                                                      f"{FONT} semibold", 11),
+                                                      f"{FONT}", 12),
                                                   text_color=TEXT_COLOR,
                                                   )
         self._options_quality.grid(
@@ -695,7 +701,7 @@ class DownloadDialog(ctk.CTkToplevel):
                                               width=120, height=30,
                                               text="Download",
                                               corner_radius=4,
-                                              font=(f"{FONT} bold", 14),
+                                              font=(f"{FONT} bold", 15),
                                               text_color=TEXT_COLOR,
                                               hover_color="#0E4F81",
                                               fg_color="#046DB9",
@@ -715,6 +721,14 @@ class DownloadDialog(ctk.CTkToplevel):
         self._button_cancel = ctk.CTkButton(self._mainframe,
                                             width=120, height=30,
                                             text="Cancel",
+                                            corner_radius=4,
+                                            font=(
+                                                f"{FONT} bold", 15),
+                                            text_color=TEXT_COLOR,
+                                            border_width=1,
+                                            border_color="#404040",
+                                            hover_color="#7C0902",
+                                            fg_color="#353535",
                                             command=self.close_dialog)
         self._button_cancel.grid(
             row=1, column=3, sticky="e", padx=10, pady=10)
