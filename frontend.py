@@ -176,6 +176,8 @@ class App(ctk.CTk):
         # Root Bindings
         self.bind("<Control-Shift-l>", self.load_presaved_data)
         self.bind("<Control-Shift-L>", self.load_presaved_data)
+        # UrlEnry bindings > scrape
+        self.entry_url.bind("<Return>", self.start_scraping)
 
     def load_presaved_data(self, _=None):
         """ 
