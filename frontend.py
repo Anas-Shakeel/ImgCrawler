@@ -244,13 +244,13 @@ class App(ctk.CTk):
             url,))
         scraping_thread.start()
 
-    def scrape_in_background(self, url, logwidget):
+    def scrape_in_background(self, url):
         """
         ### Scrape in Background
         scrape the data in background (new thread)
         """
         try:
-            result = self.backend.get_response(url, logwidget)
+            result = self.backend.get_response(url)
             self.after(0, self.update_gui, result)
         except Exception as e:
             # In-case of errors, call error handler
@@ -373,7 +373,10 @@ class App(ctk.CTk):
         ...
 
     def download(self):
-        """ Download the images """
+        """ 
+        ### Download
+        Initiate the download dialog
+        """
         # Scrape Validation
         if not self.scraped_data:
             # Haven't Scraped anything yet!
@@ -445,6 +448,7 @@ class App(ctk.CTk):
         # self.update_idletasks()
         self.after(0, self.download_dialog.hide_progress_bar)
         self.download_dialog._button_download.configure(state="normal")
+        self.download_dialog.get_focus_force(0)
 
     def text_downloader(self, format_, filename_, directory_):
         """
