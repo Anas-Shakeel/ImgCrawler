@@ -199,6 +199,11 @@ class App(ctk.CTk):
         self.scraped_data = presaved_data
         self.update_properties()
 
+        # Instantiate the progress bar
+        self.scrape_progress_bar.grid(row=1, column=0,
+                                      padx=10, pady=0, sticky="ew")
+        self.scrape_progress_bar.start()
+
         # Shows the loaded images
         self.show_images()
 
@@ -262,7 +267,6 @@ class App(ctk.CTk):
         Code to run when the scraping process is finished
         """
         self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
-        self.scrape_progress_bar.grid_forget()
         messagebox.showinfo("Scraping Complete",
                             "Target URL has been scraped successfully.")
 
@@ -367,6 +371,10 @@ class App(ctk.CTk):
                            dimensions=image['resolution'], uploaded=image['uploaded'],
                            uploader=image['uploader'], views=image['views'],
                            likes=image['likes'],).grid(row=index, padx=10, pady=3, sticky="ew")
+        # Show images DONE...
+        ...
+        # disable progressbar
+        self.scrape_progress_bar.grid_forget()
 
     def cancel_scraping(self):
         """ Cancel/Terminate the scraping thread """
@@ -975,13 +983,12 @@ class ImageItemFrame(ctk.CTkFrame):
             self.thumbnail = ctk.CTkImage(Image.open(
                 "assets\\thumb_preview.jpg"), size=(80, 80))
 
-
-    def slice_string(self, string:str, after:int) -> str:
+    def slice_string(self, string: str, after: int) -> str:
         """ 
         ### Slice string
         Slices the string if the length of string is greater than 
         `after` chars & joins a `...` three dot string.
-        
+
         ```
         # Example
         >> string = "slice me please" # length is 15 characters
@@ -989,12 +996,10 @@ class ImageItemFrame(ctk.CTkFrame):
         'slice me p...'
         ```
         """
-        
+
         # Return the string if length is equal/less than `after`
         if len(string) <= after:
             return string
-        
+
         # Do your thing otherwise
         return f"{string[:after].strip()}..."
-        
-    
