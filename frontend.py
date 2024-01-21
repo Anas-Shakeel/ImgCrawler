@@ -241,7 +241,7 @@ class App(ctk.CTk):
 
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
-            url, self.textbox_log))
+            url,))
         scraping_thread.start()
 
     def scrape_in_background(self, url, logwidget):
