@@ -51,26 +51,19 @@ class ImgPile:
     def __init__(self) -> None:
         self.headers = {'User-Agent': 'Mozilla/5.0'}
 
-    def get(self, url: str, logwidget):
+    def get(self, url: str):
         """ 
         ### Get
         This method will get the data you need regarding given `url`.
         """
-        self.logwindow = logwidget
-        self.logwindow.write("[Info] Starting Page Crawl...\n")
-
         # Extract all pages
         pages = self.extract_pages(url)
 
-        self.logwindow.write(f"[Info] {len(pages)} Pages Extracted...\n")
-
-        self.logwindow.write(f"\n[Info] Extracting Images\n")
         # Stores all pages & images
         master_data = []
         # Iterate through every page and extract image links
         for page in pages:
             for link in self.extract_image_links(page):
-                self.logwindow.write(f"[Info] Extracted Image link: {link}\n")
                 master_data.append(self.extract_image_data(link))
 
         return master_data
@@ -81,7 +74,6 @@ class ImgPile:
         temp_pages = [start_page]
 
         def recurse(page):
-            self.logwindow.write(f"[Info] Extracting Page: {page}\n")
             # accessing page
             try:
                 response = requests.get(page, headers=self.headers)
