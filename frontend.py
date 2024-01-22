@@ -321,9 +321,6 @@ class App(ctk.CTk):
         ### Handle Download Errors
         handle errors which occur in downloading process
         """
-        # Enable download button
-        # self.button_download.configure(text="Download Images", state=tk.NORMAL)
-
         print("{}".format(error_message))
         # Show Error Dialog
         messagebox.showerror(
@@ -402,7 +399,7 @@ class App(ctk.CTk):
         # Give the focus to download dialog
         self.download_dialog.get_focus_force(200)
 
-    def image_downloader(self, save_path, image_quality,  step_callback, event:Event):
+    def image_downloader(self, save_path, image_quality,  step_callback, event: Event):
         """
         ### Image Downloader
         Begin image downloading process/thread.
@@ -414,13 +411,13 @@ class App(ctk.CTk):
         ```
         """
         self.image_download_thread = Thread(target=self.download_images,
-                                            args=(save_path, 
+                                            args=(save_path,
                                                   image_quality,
                                                   step_callback,
                                                   event))
         self.image_download_thread.start()
 
-    def download_images(self, save_path, image_quality, step_callback, event:Event):
+    def download_images(self, save_path, image_quality, step_callback, event: Event):
         """
         ### Begin Download
         Start the downloading process in a new thread
@@ -431,9 +428,6 @@ class App(ctk.CTk):
 
             # Download imnages
             for image in self.scraped_data:
-                if event.is_set(): # Incase user pressed cancel
-                    break
-                
                 if image_quality == "High Quality":
                     filename = self.backend.sanitize_string(
                         image['title']) + image['extension']
@@ -447,8 +441,11 @@ class App(ctk.CTk):
                 # Increase progress (progressbar)
                 step_callback(self.total_images)
 
+                if event.is_set():  # Incase user cancels downloading
+                    return
+
+            # Incase download is completed
             self.download_completed()
-            self.update_idletasks()
 
         except Exception as e:
             self.after(0, self.handle_download_errors, e)
@@ -458,12 +455,13 @@ class App(ctk.CTk):
         ### Download Completed
         Code to execute when the download is completed
         """
-        # TODO > Show Download Complete Popup!
+        # Show Download Complete Popup!
         messagebox.showinfo("Download Complete",
                             "Your Download has been completed.")
-        # self.update_idletasks()
         self.after(0, self.download_dialog.hide_progress_bar)
+        self.download_dialog._button_cancel.configure(state="disabled")
         self.download_dialog._button_download.configure(state="normal")
+        self.download_dialog.image_downloading_event.clear()
         self.download_dialog.get_focus_force(0)
 
     def text_downloader(self, format_, filename_, directory_):
@@ -621,6 +619,7 @@ class DownloadDialog(ctk.CTkToplevel):
         FIELD_HOVER_COLOR = "#046DB9"
         PRIMARY_COLOR = "#046DB9"
 
+        self.image_downloading_event = Event()  # Download event
         self.image_downloader = image_downlod_callback
         self.text_downloader = text_download_callback
 
@@ -628,6 +627,7 @@ class DownloadDialog(ctk.CTkToplevel):
         self.title("Download")
         self.place_in_center(520, 140)
         self.resizable(False, False)
+        self.protocol("WM_DELETE_WINDOW", self.close_dialog)
         # self.grab_set()
 
         # * Mainframe
@@ -726,6 +726,7 @@ class DownloadDialog(ctk.CTkToplevel):
         # * Cancel button
         self._button_cancel = ctk.CTkButton(self._mainframe,
                                             width=120, height=30,
+                                            state="disabled",
                                             text="Cancel",
                                             corner_radius=4,
                                             font=(
@@ -784,7 +785,8 @@ class DownloadDialog(ctk.CTkToplevel):
         ### Hide Progress bar
         hides the progress bar
         """
-        # Place the bar
+        # Reset & Hide the bar
+        self.reset_progress_bar()
         self._progress_bar.grid_forget()
 
     def reset_progress_bar(self):
@@ -824,9 +826,10 @@ class DownloadDialog(ctk.CTkToplevel):
         # Initiate Download
         self._button_download.configure(state="disabled")
         self.show_progress_bar()
+        self._button_cancel.configure(state="normal")
         if format_ == "IMAGE":
-            self.image_downloading_event = Event()
-            self.image_downloader(directory_, quality_, self.on_progress, self.image_downloading_event)
+            self.image_downloader(
+                directory_, quality_, self.on_progress, self.image_downloading_event)
         else:
             self.text_downloader(format_, filename_, directory_)
 
@@ -851,14 +854,26 @@ class DownloadDialog(ctk.CTkToplevel):
         ### Cacnel Download
         Cancel the download by setting `image_downloading_event`  to true.
         """
+        self._button_cancel.configure(state="disabled")
         self.image_downloading_event.set()
+        self.after(0, self.hide_progress_bar)
+        self._button_download.configure(state="normal")
+        messagebox.showinfo("Download Cancelled",
+                            "Your Download has been cancelled!")
+        self.get_focus_force(0)
 
     def close_dialog(self):
         """
         ### Close Dialog
         Close the dialog aka DESTROY!
         """
-        self.destroy()
+        try:
+            if not self.image_downloading_event.is_set():
+                self.image_downloading_event.set()
+        except Exception as e:
+            print("Error occurred:", e)
+
+        self.after(0, self.destroy)
 
 
 class ImageItemFrame(ctk.CTkFrame):
@@ -986,5 +1001,3 @@ class ImageItemFrame(ctk.CTkFrame):
 
         # Do your thing otherwise
         return f"{string[:after].strip()}..."
-
-"App.image_downloader() missing 1 required positional argument: 'event'"
