@@ -402,7 +402,7 @@ class App(ctk.CTk):
         # Give the focus to download dialog
         self.download_dialog.get_focus_force(200)
 
-    def image_downloader(self, save_path, image_quality,  step_callback):
+    def image_downloader(self, save_path, image_quality,  step_callback, event:Event):
         """
         ### Image Downloader
         Begin image downloading process/thread.
@@ -413,11 +413,14 @@ class App(ctk.CTk):
         step_callback = called everytime an image is downloaded
         ```
         """
-        self.image_download_thread = Thread(
-            target=self.download_images, args=(save_path, image_quality, step_callback))
+        self.image_download_thread = Thread(target=self.download_images,
+                                            args=(save_path, 
+                                                  image_quality,
+                                                  step_callback,
+                                                  event))
         self.image_download_thread.start()
 
-    def download_images(self, save_path, image_quality, step_callback):
+    def download_images(self, save_path, image_quality, step_callback, event:Event):
         """
         ### Begin Download
         Start the downloading process in a new thread
@@ -428,6 +431,9 @@ class App(ctk.CTk):
 
             # Download imnages
             for image in self.scraped_data:
+                if event.is_set(): # Incase user pressed cancel
+                    break
+                
                 if image_quality == "High Quality":
                     filename = self.backend.sanitize_string(
                         image['title']) + image['extension']
@@ -519,40 +525,6 @@ class App(ctk.CTk):
         # Wait for the main_thread to come into mainloop!
         self.update()
         self.after(1500, self.destroy)
-
-
-class ImageBox(ctk.CTkFrame):
-    """ An Imagebox that takes `thumb_url` and displays it """
-
-    def __init__(self, master, thumb_url,  *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
-
-        self.thumb_url = thumb_url
-
-        self.load_image()
-        self.create_widgets()
-
-    def load_image(self):
-        """ 
-        ### Load image
-        Open the image and hold the reference in `self.image`
-        """
-        try:
-            raw_data = requests.get(self.thumb_url).content
-            image = Image.open(BytesIO(raw_data))
-
-            self.image = ctk.CTkImage(image, size=(180, 180))
-        except Exception as e:
-            print("Error ocurred: {}".format(e))
-            # Load default image thumbnail
-            image = Image.open("assets\\thumb_preview.jpg")
-            self.image = ctk.CTkImage(image, size=(180, 180))
-
-    def create_widgets(self):
-        self.canvas = ctk.CTkLabel(
-            self, text="", image=self.image, width=180, height=180)
-        self.canvas.image = self.image
-        self.canvas.grid(row=0, column=0, padx=5, pady=5)
 
 
 class DirectoryField(ctk.CTkFrame):
@@ -763,7 +735,7 @@ class DownloadDialog(ctk.CTkToplevel):
                                             border_color="#404040",
                                             hover_color="#7C0902",
                                             fg_color="#353535",
-                                            command=self.close_dialog)
+                                            command=self.cancel_download)
         self._button_cancel.grid(
             row=1, column=3, sticky="e", padx=10, pady=10)
         # Tooltip for Cancel button
@@ -853,7 +825,8 @@ class DownloadDialog(ctk.CTkToplevel):
         self._button_download.configure(state="disabled")
         self.show_progress_bar()
         if format_ == "IMAGE":
-            self.image_downloader(directory_, quality_, self.on_progress)
+            self.image_downloading_event = Event()
+            self.image_downloader(directory_, quality_, self.on_progress, self.image_downloading_event)
         else:
             self.text_downloader(format_, filename_, directory_)
 
@@ -872,6 +845,13 @@ class DownloadDialog(ctk.CTkToplevel):
         """
         self.after(after, self.lift)
         self.after(after, self.focus_force)
+
+    def cancel_download(self):
+        """ 
+        ### Cacnel Download
+        Cancel the download by setting `image_downloading_event`  to true.
+        """
+        self.image_downloading_event.set()
 
     def close_dialog(self):
         """
@@ -1006,3 +986,5 @@ class ImageItemFrame(ctk.CTkFrame):
 
         # Do your thing otherwise
         return f"{string[:after].strip()}..."
+
+"App.image_downloader() missing 1 required positional argument: 'event'"
