@@ -980,8 +980,9 @@ class ImageItemFrame(ctk.CTkFrame):
 
             self.thumbnail = ctk.CTkImage(image, size=(size, size))
         except Exception as e:
-            print("Thumbnail not found: {}".format(e))
-            # Load default image thumbnail
+            # ? Uncomment to print error
+            # print("Thumbnail not found: {}".format(e))
+            # ? Load default image thumbnail
             self.thumbnail = ctk.CTkImage(Image.open(
                 "assets\\thumb_preview.jpg"), size=(80, 80))
 
