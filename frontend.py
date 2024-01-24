@@ -364,10 +364,13 @@ class App(ctk.CTk):
     def show_images_in_background(self, event: Event):
         """ Displays images in `view_frame` in background """
         # Clear the existing images first (if any)
-        for child in self.view_frame.winfo_children()[::-1]:
-            child.grid_forget()
-            child.destroy()
+        childs = self.view_frame.winfo_children()[::-1]
+        if childs:
+            for child in childs:
+                child.grid_forget()
+                self.view_frame.after(5, child.destroy)
 
+        # Create new childs (spawn images)
         for index, image in enumerate(self.scraped_data):
             # If event is set, stop immediately!
             if event.is_set():
