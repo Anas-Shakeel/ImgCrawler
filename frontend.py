@@ -460,7 +460,7 @@ class App(ctk.CTk):
                     image_url = image['lq_url']
 
                 self.backend.download_image(image_url,
-                                            filename, save_path)
+                                            filename, save_path, event)
                 # Increase progress (progressbar)
                 step_callback(self.total_images)
 
@@ -542,17 +542,16 @@ class App(ctk.CTk):
             self.show_image_event.set()
         except AttributeError:
             pass
-        
+
         try:
             self.scraping_event.set()
         except AttributeError:
             pass
-        
+
         try:
             self.download_dialog.image_downloading_event.set()
         except AttributeError:
             pass
-        
 
         # Wait for the main_thread to come into mainloop!
         self.update()
@@ -1013,4 +1012,3 @@ class ImageItemFrame(ctk.CTkFrame):
             # ? Load default image thumbnail
             self.thumbnail = ctk.CTkImage(Image.open(
                 "assets\\thumb_preview.jpg"), size=(80, 80))
-
