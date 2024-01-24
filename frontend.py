@@ -537,11 +537,22 @@ class App(ctk.CTk):
         Close the application by destroying everything and killing all background
         threads (if running)
         """
-        # Kill the show_image Thread
+        # Kill the Worker Threads
         try:
             self.show_image_event.set()
         except AttributeError:
             pass
+        
+        try:
+            self.scraping_event.set()
+        except AttributeError:
+            pass
+        
+        try:
+            self.download_dialog.image_downloading_event.set()
+        except AttributeError:
+            pass
+        
 
         # Wait for the main_thread to come into mainloop!
         self.update()
