@@ -936,11 +936,10 @@ class ImageItemFrame(ctk.CTkFrame):
         self.description_frame.rowconfigure(1, weight=1)
 
         # Create a title
-        ctk.CTkLabel(self.description_frame, text=self.slice_string(title, 90),
-                     font=("Segoe UI bold", 20), anchor="sw",
-                     text_color=title_color,
-
-                     ).grid(row=0, column=0, padx=5, pady=5, sticky="news")
+        ctk.CTkLabel(self.description_frame, text=title,
+                     font=("Segoe UI Bold", 20), anchor="sw",
+                     text_color=title_color,).grid(row=0, column=0,
+                                                   padx=5, pady=5, sticky="news")
 
         # Create details_frame
         self.details_frame = ctk.CTkFrame(
@@ -1001,23 +1000,3 @@ class ImageItemFrame(ctk.CTkFrame):
             self.thumbnail = ctk.CTkImage(Image.open(
                 "assets\\thumb_preview.jpg"), size=(80, 80))
 
-    def slice_string(self, string: str, after: int) -> str:
-        """ 
-        ### Slice string
-        Slices the string if the length of string is greater than 
-        `after` chars & joins a `...` three dot string.
-
-        ```
-        # Example
-        >> string = "slice me please" # length is 15 characters
-        >> string_slice(string, after=5)
-        'slice me p...'
-        ```
-        """
-
-        # Return the string if length is equal/less than `after`
-        if len(string) <= after:
-            return string
-
-        # Do your thing otherwise
-        return f"{string[:after].strip()}..."
