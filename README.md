@@ -68,9 +68,7 @@ __NOTE:__ Executable file is on it's way! and then you won't need to do the step
 > The file will be loaded in the application and the imnages will start to appear as they load!<br>
 > **This loading will be faster than the actual scraping!** <br>
 >
-> #### _Demo Ends Here!_
-> Use the application and let me know if any bugs found! cuz there'll be alot of them! <br>
-> ___Oh! and the `cancel` button (next to scrape button) doesn't work yet. I'm working on it!!!___
+> #### Use the application and let me know if any bugs found! cuz there'll be alot of them! 
 >
 
 ## Project structure
