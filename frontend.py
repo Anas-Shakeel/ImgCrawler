@@ -108,12 +108,13 @@ class App(ctk.CTk):
                                                   border_color="#404040",
                                                   hover_color="#7C0902",
                                                   fg_color="#353535",
+                                                  state="disabled",
                                                   command=self.cancel_scraping)
         self.button_scrape_cancel.grid(row=0, column=3)
         # Tooltip for button
         CTkToolTip(self.button_scrape_cancel,
                    follow=False, delay=0.5,
-                   message="Cancel the scrape (doesn't work yet)",)
+                   message="Cancel the scrape.",)
 
         # ? Padding childs
         for child in self.fields_frame.winfo_children():
@@ -237,28 +238,35 @@ class App(ctk.CTk):
                                  "Please enter a valid Album's URL from imgpile.com website.")
             return
 
-        # Disable button
+        # Disable scrape button
         self.button_scrape.configure(
-            text="Please wait...", state=tk.DISABLED)
+            text="Please wait...", state="disabled")
+
+        # Enable cancel button
+        self.button_scrape_cancel.configure(state="normal")
 
         # Instantiate the progress bar
         self.scrape_progress_bar.grid(
             row=1, column=0, padx=10, pady=0, sticky="ew")
         self.scrape_progress_bar.start()
 
+        # Scraping thread event
+        self.scraping_event = Event()
+
         # Start scraping in new thread
         scraping_thread = Thread(target=self.scrape_in_background, args=(
-            url,))
+            url, self.scraping_event,))
         scraping_thread.start()
 
-    def scrape_in_background(self, url):
+    def scrape_in_background(self, url, event: Event):
         """
         ### Scrape in Background
         scrape the data in background (new thread)
         """
         try:
-            result = self.backend.get_response(url)
-            self.after(0, self.update_gui, result)
+            result = self.backend.get_response(url, event)
+            if result:
+                self.after(0, self.update_gui, result)
         except Exception as e:
             # In-case of errors, call error handler
             self.after(0, self.handle_scrape_errors, e)
@@ -268,7 +276,8 @@ class App(ctk.CTk):
         ### Scrape Completed
         Code to run when the scraping process is finished
         """
-        self.button_scrape.configure(text="Scrape", state=tk.NORMAL)
+        self.button_scrape.configure(text="Scrape", state="normal")
+        self.button_scrape_cancel.configure(state="disabled")
         messagebox.showinfo("Scraping Complete",
                             "Target URL has been scraped successfully.")
 
@@ -370,14 +379,25 @@ class App(ctk.CTk):
                            dimensions=image['resolution'], uploaded=image['uploaded'],
                            uploader=image['uploader'], views=image['views'],
                            likes=image['likes'],).grid(row=index, padx=10, pady=3, sticky="ew")
-        # Show images DONE...
-        ...
         # disable progressbar
         self.scrape_progress_bar.grid_forget()
 
     def cancel_scraping(self):
-        """ Cancel/Terminate the scraping thread """
-        ...
+        """ 
+        ### Cancel Scraping
+        cancel or terminate the scraping thread  AKA (stop the scraping)
+        """
+        # Stop the thread
+        self.scraping_event.set()
+
+        # Do some stuff relating UI!
+        self.scrape_progress_bar.grid_forget()
+        self.button_scrape.configure(text="Scrape", state="normal")
+        self.button_scrape_cancel.configure(state="disabled")
+
+        # Show a message of cancellation
+        messagebox.showerror("Scraping Cancelled",
+                             "Target URL has not been scraped successfully. Request was cancelled by User!")
 
     def download(self):
         """ 
