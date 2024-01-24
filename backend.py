@@ -180,7 +180,7 @@ class Backend:
 
         return sanitized_string
 
-    def download_image(self, image_url, filename, save_path):
+    def download_image(self, image_url, filename, save_path, event):
         """Downloads all images in local storage"""
         # URL Check
         if not image_url:
@@ -198,6 +198,11 @@ class Backend:
         if not path.exists(directory):
             # Download the image content
             raw_image_data = requests.get(image_url).content
+
+            # If user cancelled
+            if event.is_set():
+                return
+
             # Save image
             with open(directory, 'wb') as img:
                 img.write(raw_image_data)
