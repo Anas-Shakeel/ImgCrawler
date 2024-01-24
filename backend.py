@@ -15,12 +15,12 @@ class Backend:
         self.img_api = ImgPile()
         pass
 
-    def get_response(self, url):
+    def get_response(self, url, event):
         """ 
         ### Get Response
         This method talks directly to the API and returns a response from it
         """
-        return self.img_api.get(url)
+        return self.img_api.get(url, event)
 
     def get_presaved_data(self, filepath: str) -> list:
         """ 

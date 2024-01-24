@@ -51,11 +51,14 @@ class ImgPile:
     def __init__(self) -> None:
         self.headers = {'User-Agent': 'Mozilla/5.0'}
 
-    def get(self, url: str):
+    def get(self, url: str, event):
         """ 
         ### Get
         This method will get the data you need regarding given `url`.
         """
+        # Thread-safe event (not actually! just sounds cool.)
+        self.event = event
+        
         # Extract all pages
         pages = self.extract_pages(url)
 
@@ -65,7 +68,11 @@ class ImgPile:
         for page in pages:
             for link in self.extract_image_links(page):
                 master_data.append(self.extract_image_data(link))
-
+                
+                # Incase, User cancelled the operation
+                if self.event.is_set():
+                    return None
+                
         return master_data
 
     def extract_pages(self, start_page):
@@ -74,11 +81,15 @@ class ImgPile:
         temp_pages = [start_page]
 
         def recurse(page):
-            # accessing page
+            # Accessing page
             try:
                 response = requests.get(page, headers=self.headers)
             except requests.exceptions.MissingSchema:
                 return
+            
+            # If user cancelled!
+            if self.event.is_set():
+                return None
 
             # extracting next_page_link
             pagination = SoupStrainer(
@@ -161,13 +172,17 @@ class ImgPile:
 
         uploaded = soup.find(
             "p", class_="description-meta margin-bottom-5").span.text
+        
+        # Incase, User cancelled
+        if self.event.is_set():
+            return None
 
         # ? Creating data dictionary & returning
         return {
             "image_url": urls[0],
             "image_link": urls[1],
-            "thumb_url": urls[2],
             "lq_url": urls[3],
+            "thumb_url": urls[2],
             "title": title,
             "size": image_size,
             "resolution": image_res,
