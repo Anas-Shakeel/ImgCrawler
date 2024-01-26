@@ -570,6 +570,7 @@ class DirectoryField(ctk.CTkFrame):
         # Entry field
         self.dir_var = ""
         self.entry_field = ctk.CTkEntry(self,
+                                        state="disabled",
                                         placeholder_text="Enter save location",
                                         font=("Segoe UI", 16),
                                         text_color="#bbb",
@@ -605,6 +606,16 @@ class DirectoryField(ctk.CTkFrame):
         for child in self.winfo_children():
             child.grid_configure(padx=2, pady=1)
 
+    def entry_write(self, text:str):
+        """ 
+        ### Entry Write
+        write `text` in `self.entry_field`
+        """
+        self.entry_field.configure(state="normal")
+        self.entry_field.delete(0, tk.END)
+        self.entry_field.insert("1", text)
+        self.entry_field.configure(state="disabled")
+
     def open_dialog(self, master):
         """
         ### Open Directory Dialog
@@ -613,10 +624,9 @@ class DirectoryField(ctk.CTkFrame):
         try:
             dir_ = filedialog.askdirectory()
             if dir_:
-                # Insert into entry field
-                self.entry_field.delete(0, tk.END)
-                self.entry_field.insert("1", normpath(dir_))
-
+                # Write `dir_` into entry_field
+                self.entry_write(normpath(dir_))
+                
         except Exception as e:
             print(f"error: {e}")
 
