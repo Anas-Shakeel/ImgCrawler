@@ -189,10 +189,11 @@ class Backend:
 
         # Create folder
         if not path.exists(save_path):
-            raise ValueError("Backend.download_image(): `save_path` must be an existing directory")
+            raise ValueError(
+                "Backend.download_image(): `save_path` must be an existing directory")
 
         # Create a dirpath, also check if it already exists
-        directory = self.filename_increment(path.join(save_path, filename))
+        directory = path.join(save_path, filename)
 
         # If file does not exists, download
         if not path.isfile(directory):
@@ -214,7 +215,8 @@ class Backend:
         """
         if not path.isdir(save_path):
             # os.mkdir(save_path)
-            raise ValueError("Backend.download_data(): `save_path` is not an existing directory.")
+            raise ValueError(
+                "Backend.download_data(): `save_path` is not an existing directory.")
 
         save_dir = path.join(save_path, self.sanitize_string(filename))
 
