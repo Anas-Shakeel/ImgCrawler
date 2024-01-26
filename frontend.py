@@ -450,7 +450,7 @@ class App(ctk.CTk):
             self.download_dialog.reset_progress_bar()
 
             # Download imnages
-            for image in self.scraped_data:
+            for index, image in enumerate(self.scraped_data):
                 if image_quality == "High Quality":
                     filename = self.backend.sanitize_string(
                         image['title']) + image['extension']
@@ -462,7 +462,7 @@ class App(ctk.CTk):
                 self.backend.download_image(image_url,
                                             filename, save_path, event)
                 # Increase progress (progressbar)
-                step_callback(self.total_images)
+                step_callback(self.total_images, index+1)
 
                 if event.is_set():  # Incase user cancels downloading
                     return
@@ -607,7 +607,7 @@ class DirectoryField(ctk.CTkFrame):
         for child in self.winfo_children():
             child.grid_configure(padx=2, pady=1)
 
-    def entry_write(self, text:str):
+    def entry_write(self, text: str):
         """ 
         ### Entry Write
         write `text` in `self.entry_field`
@@ -627,7 +627,7 @@ class DirectoryField(ctk.CTkFrame):
             if dir_:
                 # Write `dir_` into entry_field
                 self.entry_write(normpath(dir_))
-                
+
         except Exception as e:
             print(f"error: {e}")
 
@@ -672,12 +672,12 @@ class DownloadDialog(ctk.CTkToplevel):
         self.place_in_center(520, 140)
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.close_dialog)
-        # self.grab_set()
 
         # * Mainframe
         self._mainframe = ctk.CTkFrame(self, border_width=1,
                                        border_color=BORDER_COLOR)
-        self._mainframe.grid(row=0, column=0, padx=5, pady=5, sticky="news")
+        self._mainframe.grid(row=0, column=0, columnspan=2,
+                             padx=5, pady=5, sticky="news")
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
@@ -793,6 +793,8 @@ class DownloadDialog(ctk.CTkToplevel):
 
         # * Progress Bar
         self._progress_bar = ttk.Progressbar(self,)
+        self.percentage_label = ctk.CTkLabel(self, text="67%",
+                                             font=("Segoe UI Semibold", 16),)
 
     def on_options_changed_datatype(self, value=None):
         """ Callback on options values change """
@@ -823,6 +825,8 @@ class DownloadDialog(ctk.CTkToplevel):
         """
         # Place the bar
         self._progress_bar.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+        self.percentage_label.grid(
+            row=1, column=1, padx=5, pady=5, sticky="ew")
 
     def hide_progress_bar(self):
         """
@@ -832,6 +836,7 @@ class DownloadDialog(ctk.CTkToplevel):
         # Reset & Hide the bar
         self.reset_progress_bar()
         self._progress_bar.grid_forget()
+        self.percentage_label.grid_forget()
 
     def reset_progress_bar(self):
         """
@@ -839,6 +844,14 @@ class DownloadDialog(ctk.CTkToplevel):
         Reset the progress bar back to default state
         """
         self._progress_bar['value'] = 0
+        self.percentage_label.configure(text="0%")
+
+    def set_percentage_to(self, percentage):
+        """ 
+        ### Set Percentage To
+        sets the percentage to `percentage`
+        """
+        self.percentage_label.configure(text=f"{percentage}%")
 
     def start_download(self):
         """
@@ -877,13 +890,16 @@ class DownloadDialog(ctk.CTkToplevel):
         else:
             self.text_downloader(format_, filename_, directory_)
 
-    def on_progress(self, tasks_):
+    def on_progress(self, total_tasks_, completed_tasks):
         """
         ### On Progress
         call this function at each download
         """
+        # Calculate percentage
+        self.set_percentage_to(round((completed_tasks/total_tasks_)*100, 1))
+
         # Increase the Progress
-        self._progress_bar['value'] += round((1/tasks_)*100, 5)
+        self._progress_bar['value'] += round((1/total_tasks_)*100, 5)
 
     def get_focus_force(self, after: int):
         """ 

@@ -214,7 +214,6 @@ class Backend:
         Downloads the `data` with the `filename` in `format` format in `save_path`
         """
         if not path.isdir(save_path):
-            # os.mkdir(save_path)
             raise ValueError(
                 "Backend.download_data(): `save_path` is not an existing directory.")
 
