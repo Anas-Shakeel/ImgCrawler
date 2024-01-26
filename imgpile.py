@@ -43,6 +43,7 @@ It should look something like below:
 """
 
 import requests
+from requests.exceptions import ConnectTimeout, ReadTimeout, MissingSchema
 from bs4 import BeautifulSoup
 from bs4 import SoupStrainer
 
@@ -50,15 +51,17 @@ from bs4 import SoupStrainer
 class ImgPile:
     def __init__(self) -> None:
         self.headers = {'User-Agent': 'Mozilla/5.0'}
+        # Timeout values:> connect timout, read timeout
+        self.timeout = (10, 15)
 
     def get(self, url: str, event):
         """ 
         ### Get
         This method will get the data you need regarding given `url`.
         """
-        # Thread-safe event (not actually! just sounds cool.)
+        # Thread event (used to stop the event at user's will.)
         self.event = event
-        
+
         # Extract all pages
         pages = self.extract_pages(url)
 
@@ -67,12 +70,16 @@ class ImgPile:
         # Iterate through every page and extract image links
         for page in pages:
             for link in self.extract_image_links(page):
-                master_data.append(self.extract_image_data(link))
-                
+                try:
+                    master_data.append(self.extract_image_data(link))
+                except:
+                    # if anything goes wrong, skip to next
+                    pass
+
                 # Incase, User cancelled the operation
                 if self.event.is_set():
                     return None
-                
+
         return master_data
 
     def extract_pages(self, start_page):
@@ -83,10 +90,12 @@ class ImgPile:
         def recurse(page):
             # Accessing page
             try:
-                response = requests.get(page, headers=self.headers)
-            except requests.exceptions.MissingSchema:
+                response = requests.get(
+                    page, headers=self.headers, timeout=self.timeout)
+            except (MissingSchema, ConnectTimeout, ReadTimeout) as e:
+                print(e)
                 return
-            
+
             # If user cancelled!
             if self.event.is_set():
                 return None
@@ -118,8 +127,12 @@ class ImgPile:
         ### Extract Image Links
         extracts all image links and yields the url
         """
-        # accessing current page
-        r = requests.get(page, headers=self.headers)
+        try:
+            # accessing current page
+            r = requests.get(page, headers=self.headers, timeout=self.timeout)
+        except (MissingSchema, ConnectTimeout, ReadTimeout) as e:
+            print(e)
+            return
 
         # Extracting its HTML
         content_div = SoupStrainer(
@@ -136,8 +149,13 @@ class ImgPile:
         ### Extract Image Data
         extracts all the image data and returns it as a dictionary
         """
-        # accessing image's page
-        r = requests.get(image_url, headers=self.headers)
+        try:
+            # accessing image's page
+            r = requests.get(image_url, headers=self.headers,
+                             timeout=self.timeout)
+        except (MissingSchema, ConnectTimeout, ReadTimeout) as e:
+            print(e)
+            return
 
         # Extracting HTML
         link_div = SoupStrainer(
@@ -172,7 +190,7 @@ class ImgPile:
 
         uploaded = soup.find(
             "p", class_="description-meta margin-bottom-5").span.text
-        
+
         # Incase, User cancelled
         if self.event.is_set():
             return None
