@@ -52,7 +52,7 @@ class ImgPile:
     def __init__(self) -> None:
         self.headers = {'User-Agent': 'Mozilla/5.0'}
         # Timeout values:> connect timout, read timeout
-        self.timeout = (10, 15)
+        self.timeout = (15, 30)
 
     def get(self, url: str, event):
         """ 
@@ -71,7 +71,8 @@ class ImgPile:
         for page in pages:
             for link in self.extract_image_links(page):
                 try:
-                    master_data.append(self.extract_image_data(link))
+                    if link and type(link) == str:
+                        master_data.append(self.extract_image_data(link))
                 except:
                     # if anything goes wrong, skip to next
                     pass
@@ -94,7 +95,7 @@ class ImgPile:
                     page, headers=self.headers, timeout=self.timeout)
             except (MissingSchema, ConnectTimeout, ReadTimeout) as e:
                 print(e)
-                return
+                return None
 
             # If user cancelled!
             if self.event.is_set():
@@ -132,7 +133,7 @@ class ImgPile:
             r = requests.get(page, headers=self.headers, timeout=self.timeout)
         except (MissingSchema, ConnectTimeout, ReadTimeout) as e:
             print(e)
-            return
+            yield None
 
         # Extracting its HTML
         content_div = SoupStrainer(
@@ -155,7 +156,7 @@ class ImgPile:
                              timeout=self.timeout)
         except (MissingSchema, ConnectTimeout, ReadTimeout) as e:
             print(e)
-            return
+            return None
 
         # Extracting HTML
         link_div = SoupStrainer(
