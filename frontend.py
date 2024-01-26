@@ -10,7 +10,7 @@ from os.path import normpath
 from threading import Thread, Event
 import requests
 from io import BytesIO
-from PIL import Image
+from PIL import Image, ImageTk
 from time import sleep
 import pyperclip
 
@@ -44,6 +44,10 @@ class App(ctk.CTk):
         self.after(0, lambda: self.state("zoomed"))
         self.option_add("*tearOff", tk.FALSE)
         self.protocol("WM_DELETE_WINDOW", self.exit_app)
+        # Icon for root window
+        self.iconpath = ImageTk.PhotoImage(file=os.path.join("assets","logo.png"))
+        self.wm_iconbitmap()
+        self.iconphoto(False, self.iconpath)
 
         # * Mainframe [to hold everything]
         self.mainframe = ctk.CTkFrame(self, fg_color=bg)
@@ -418,7 +422,8 @@ class App(ctk.CTk):
         # * Show Download Dialog
         self.download_dialog = DownloadDialog(self,
                                               self.image_downloader,
-                                              self.text_downloader)
+                                              self.text_downloader,
+                                              icon=self.iconpath)
         # Give the focus to download dialog
         self.download_dialog.get_focus_force(200)
 
@@ -650,7 +655,7 @@ class DownloadDialog(ctk.CTkToplevel):
     Download Popup Dialog custom widget for various downloading options & fields
     """
 
-    def __init__(self, master, image_downlod_callback, text_download_callback, *args, **kwargs):
+    def __init__(self, master, image_downlod_callback, text_download_callback, icon, *args, **kwargs):
         super().__init__(master, fg_color="#1f1f1f", *args, **kwargs)
 
         # * Colors & Fonts
@@ -672,6 +677,9 @@ class DownloadDialog(ctk.CTkToplevel):
         self.place_in_center(520, 140)
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.close_dialog)
+        # Icon
+        self.wm_iconbitmap()
+        self.after(200, lambda: self.iconphoto(False, icon))
 
         # * Mainframe
         self._mainframe = ctk.CTkFrame(self, border_width=1,
