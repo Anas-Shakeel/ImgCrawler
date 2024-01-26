@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="https://github.com/Anas-Shakeel/ImgCrawler/assets/131923402/36be0afc-f11a-453f-bc59-9d684a0b0e55">
+</div>
+
 <h1 align="center"> Img-Crawler </h1>
 
 ## **Description**
@@ -20,6 +24,7 @@ __NOTE:__ Executable file is on it's way! and then you won't need to do the step
 > 3. Extract the `zip` file.
 > 4. Open terminal in this folder and run `pip install -r requirements.txt`
 > 5. Run `main.py` either from terminal or just by double-clicking it.
+
 >
 >
 > ### **How to use:**
@@ -44,7 +49,7 @@ __NOTE:__ Executable file is on it's way! and then you won't need to do the step
 > 
 > - ![json-format](https://github.com/Anas-Shakeel/ImgCrawler/assets/131923402/98cb8f26-977d-443d-bf19-b396a5bd700f) <br>
 > 
-> - Type a directory to save the files __OR__ Choose a directory by clicking the button with folder icon, DUHH! <br>
+> - Choose a directory by clicking the button with folder icon.<br>
 > 
 >
 > - Click __Download__ and let the downloading happen! **(Do your thing again! and when the downloading is complete, You'll get notified.)** <br>
