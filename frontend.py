@@ -570,19 +570,20 @@ class DirectoryField(ctk.CTkFrame):
         # Entry field
         self.dir_var = ""
         self.entry_field = ctk.CTkEntry(self,
-                                        state="disabled",
                                         placeholder_text="Enter save location",
                                         font=("Segoe UI", 16),
                                         text_color="#bbb",
                                         fg_color="#292929",
                                         corner_radius=5,
                                         border_width=1, border_color="#404040",
+                                        state="disabled",
                                         )
+        self.entry_write("Choose a directory")
         self.entry_field.grid(row=0, column=0, sticky="ew")
         # Tooltip for Directory Field
         CTkToolTip(self.entry_field,
                    follow=False, delay=0.5,
-                   message="Enter a directory/location where you want to save the data",)
+                   message="Choose a directory where you want to save the data",)
 
         # Open File Dialog Button
         self.image = ctk.CTkImage(
