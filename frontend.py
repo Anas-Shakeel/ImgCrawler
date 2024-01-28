@@ -215,7 +215,7 @@ class App(ctk.CTk):
         self.show_images()
 
         self.view_frame.configure(
-            label_text=f"{self.total_images} images were loaded")
+            label_text=f"Total Images: {self.total_images} | Total Size: {self.total_size}")
 
         messagebox.showinfo("Load Success",
                             "Your json file has been successfully loaded into the app. You can now download the images or csv.")
@@ -298,7 +298,7 @@ class App(ctk.CTk):
 
         # Update 'view_frame's title
         self.view_frame.configure(
-            label_text=f"{self.total_images} images were scraped")
+            label_text=f"Total Images: {self.total_images} | Total Size: {self.total_size}")
 
     def update_properties(self):
         """
