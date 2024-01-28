@@ -282,8 +282,6 @@ class App(ctk.CTk):
         """
         self.button_scrape.configure(text="Scrape", state="normal")
         self.button_scrape_cancel.configure(state="disabled")
-        messagebox.showinfo("Scraping Complete",
-                            "Target URL has been scraped successfully.")
 
     def update_gui(self, result=None):
         """ Updates the GUI """
@@ -299,6 +297,10 @@ class App(ctk.CTk):
         # Update 'view_frame's title
         self.view_frame.configure(
             label_text=f"Total Images: {self.total_images} | Total Size: {self.total_size}")
+        
+        # Showing message
+        messagebox.showinfo("Scraping Complete",
+                            "Target URL has been scraped successfully.")
 
     def update_properties(self):
         """
@@ -1020,7 +1022,7 @@ class ImageItemFrame(ctk.CTkFrame):
         # Views label
         self.views_icon = ctk.CTkImage(
             dark_image=Image.open("assets\\views_light_16px.png"))
-        ctk.CTkLabel(self.view_likes_frame, text=f"{views} ", image=self.views_icon,
+        ctk.CTkLabel(self.view_likes_frame, text=f"{views} views", image=self.views_icon,
                      font=("Segoe UI bold", 15), text_color=details_color, compound="right",
                      anchor="s").grid(row=0, padx=5, pady=5, sticky="e")
 
