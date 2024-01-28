@@ -180,7 +180,7 @@ class ImgPile:
         # Views and likes
         views_likes_meta = soup.select(
             "div.header div.header-content-right")[-1].text.strip().split("\n")
-        views = views_likes_meta[0]
+        views = views_likes_meta[0].split()[0]
         likes = views_likes_meta[1].strip()
 
         # Image links storage
