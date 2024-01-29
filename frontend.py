@@ -45,7 +45,8 @@ class App(ctk.CTk):
         self.option_add("*tearOff", tk.FALSE)
         self.protocol("WM_DELETE_WINDOW", self.exit_app)
         # Icon for root window
-        self.iconpath = ImageTk.PhotoImage(file=os.path.join("assets","logo.png"))
+        self.iconpath = ImageTk.PhotoImage(
+            file=os.path.join("assets", "logo.png"))
         self.wm_iconbitmap()
         self.iconphoto(False, self.iconpath)
 
@@ -132,7 +133,7 @@ class App(ctk.CTk):
 
         # * View Frame
         self.view_frame = ctk.CTkScrollableFrame(self.mainframe, fg_color=fg,
-                                                 label_text="Images",
+                                                 label_text="",
                                                  label_text_color=title_color,
                                                  label_fg_color="#353535",
                                                  border_width=1,
@@ -146,9 +147,16 @@ class App(ctk.CTk):
         self.mainframe.rowconfigure(2, weight=1)
         self.view_frame.columnconfigure(0, weight=1)
 
+        # No Images Label+Image Widget
+        self.no_images_image = ctk.CTkImage(dark_image=Image.open(
+            "assets\\no_image_dark.png"), size=(32, 32))
+        ctk.CTkLabel(self.view_frame, font=("Segoe UI Semibold", 25),
+                     text="No images to show", text_color="#404040",
+                     image=self.no_images_image, compound="left").grid()
+
         # * Other inputs Frame
-        self.other_frame = ctk.CTkFrame(
-            self.mainframe, border_width=1, border_color=border_color, fg_color=fg, height=50)
+        self.other_frame = ctk.CTkFrame(self.mainframe, border_width=1,
+                                        border_color=border_color, fg_color=fg, height=50)
         self.other_frame.grid(row=3, padx=5, pady=5, sticky="wes")
 
         self.button_download_data = ctk.CTkButton(self.other_frame,
@@ -297,7 +305,7 @@ class App(ctk.CTk):
         # Update 'view_frame's title
         self.view_frame.configure(
             label_text=f"Total Images: {self.total_images} | Total Size: {self.total_size}")
-        
+
         # Showing message
         messagebox.showinfo("Scraping Complete",
                             "Target URL has been scraped successfully.")
