@@ -7,6 +7,9 @@
 ## **Description**
 > `Img-Crawler` is a __GUI__ application that downloads bulks of images from [imgpile.com](https://imgpile.com/). </br> It uses a _Custom API_ i created in python that scraps an album's `url` and returns every image's details as `json` data.
 
+## **Note**
+Impile has changed/updated their website and API, so now this software is useless until i update my api to adapt to the newer (and more f**ked up) imgpile, and i don't have that much time.
+
 ## **Features**
 - Download the images in bulk.
 - Modern & User Friendly UI.
